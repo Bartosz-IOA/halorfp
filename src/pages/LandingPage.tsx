@@ -139,150 +139,115 @@ const ParticleField: React.FC = () => {
 
 // ─── MAIN PAGE ───────────────────────────────────────────────────────────────
 export const LandingPage: React.FC = () => {
-  const maxW = '1200px';
-  const px = '40px';
-
   return (
-    <div style={{ backgroundColor: BG, minHeight: '100vh', color: '#fff', position: 'relative', fontFamily: "'Inter', Arial, sans-serif", overflowX: 'hidden' }}>
+    <div className="relative min-h-screen bg-navy-primary text-white font-sans overflow-x-hidden">
       <ParticleField />
 
       {/* ── NAV ── */}
-      <nav style={{
-        position: 'relative', zIndex: 10,
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        maxWidth: maxW, margin: '0 auto', padding: `20px ${px}`,
-      }}>
-        <img src="/halo-wordmark.svg" alt="HALO" style={{ height: '26px', width: 'auto' }} />
+      <nav className="relative z-10 flex items-center justify-between max-w-[1200px] mx-auto px-6 py-5 md:px-10">
+        <img src="/halo-wordmark.svg" alt="HALO" className="h-5 md:h-6 w-auto" />
         <NavLink
           to="/login"
-          style={{ color: 'rgba(255,255,255,0.55)', fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', textDecoration: 'none' }}
+          className="text-white/55 text-[10px] md:text-[11px] font-bold tracking-widest uppercase hover:text-yellow transition-colors"
         >
           Log In
         </NavLink>
       </nav>
 
       {/* ── HERO ── */}
-      <section style={{ position: 'relative', zIndex: 10, maxWidth: maxW, margin: '0 auto', padding: `40px ${px} 80px` }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: '60px', alignItems: 'center' }}>
-
+      <section className="relative z-10 max-w-[1200px] mx-auto px-6 md:px-10 py-10 md:py-20">
+        <div className="flex flex-col-reverse md:grid md:grid-cols-[1.1fr_0.9fr] gap-12 md:gap-16 items-center">
           {/* LEFT: Copy */}
           <div>
-            <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '11px', letterSpacing: '0.05em', marginBottom: '16px' }}>
+            <p className="text-white/45 text-[10px] md:text-[11px] tracking-wide mb-4">
               Pre-Contract Intelligence for Enterprise Bidding
             </p>
 
             {/* Pill badges */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '28px' }}>
+            <div className="flex flex-wrap gap-2 mb-6 md:mb-7">
               {['PRE-CONTRACT INTELLIGENCE', 'ENTERPRISE BIDDING'].map(t => (
-                <span key={t} style={{
-                  border: `1px solid ${YELLOW}`, color: YELLOW,
-                  fontSize: '9px', fontWeight: 700, letterSpacing: '0.1em',
-                  padding: '4px 14px', borderRadius: '999px', textTransform: 'uppercase',
-                }}>{t}</span>
+                <span key={t} className="border border-yellow text-yellow text-[8px] md:text-[9px] font-bold tracking-widest px-3 py-1 md:px-3.5 md:py-1 rounded-full uppercase">
+                  {t}
+                </span>
               ))}
             </div>
 
             {/* Headline */}
-            <h1 style={{
-              fontSize: 'clamp(52px, 6vw, 84px)',
-              fontWeight: 800, fontStyle: 'italic',
-              lineHeight: 1.0, color: '#ffffff',
-              margin: '0 0 24px', letterSpacing: '-0.02em',
-            }}>
+            <h1 className="text-[3rem] leading-[1.1] md:text-[clamp(52px,6vw,84px)] font-extrabold italic text-white mb-6 tracking-tight">
               Win more.<br />Bid smarter.
             </h1>
 
             {/* Sub-copy */}
-            <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px', lineHeight: 1.7, maxWidth: '460px', marginBottom: '28px' }}>
+            <p className="text-white/50 text-sm md:text-base leading-relaxed max-w-[460px] mb-8">
               AI agents governing your entire pre-contract process —
               from first opportunity to contract signature. Structured,
               auditable, defensible at every stage.
             </p>
 
             {/* Tool tags */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '40px' }}>
+            <div className="flex flex-wrap gap-2 mb-8 md:mb-10">
               {TOOL_TAGS.map(t => (
-                <span key={t} style={{
-                  border: '1px solid rgba(255,255,255,0.18)',
-                  color: 'rgba(255,255,255,0.45)',
-                  fontSize: '9px', fontWeight: 700, letterSpacing: '0.1em',
-                  padding: '5px 14px', borderRadius: '3px', textTransform: 'uppercase',
-                }}>{t}</span>
+                <span key={t} className="border border-white/20 text-white/45 text-[8px] md:text-[9px] font-bold tracking-widest px-3 py-1.5 md:px-3.5 md:py-1.5 rounded uppercase">
+                  {t}
+                </span>
               ))}
             </div>
 
             {/* CTA */}
-            <button style={{
-              background: YELLOW, color: '#0f1c2e',
-              fontWeight: 800, fontSize: '11px', letterSpacing: '0.1em',
-              textTransform: 'uppercase', padding: '16px 40px',
-              borderRadius: '999px', border: 'none', cursor: 'pointer',
-              boxShadow: `0 0 24px ${YELLOW}40`,
-            }}>
+            <button className="bg-yellow text-[#0f1c2e] font-extrabold text-[10px] md:text-[11px] tracking-widest uppercase px-8 py-3.5 md:px-10 md:py-4 rounded-full w-full md:w-auto shadow-[0_0_24px_rgba(240,255,64,0.25)] hover:scale-105 transition-transform">
               Request a 2-month proof of value
             </button>
           </div>
 
           {/* RIGHT: Particle image */}
-          <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+          <div className="flex justify-center md:justify-end items-center w-full">
             <img
               src="/hero-particles.png"
               alt="AI intelligence visualization"
-              style={{ width: '100%', maxWidth: '600px', height: 'auto', objectFit: 'contain' }}
+              className="w-[80%] md:w-full max-w-[600px] h-auto object-contain"
             />
           </div>
         </div>
       </section>
 
       {/* ── STATS ── */}
-      <section style={{ position: 'relative', zIndex: 10, maxWidth: maxW, margin: '0 auto', padding: `0 ${px} 80px` }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+      <section className="relative z-10 max-w-[1200px] mx-auto px-6 md:px-10 pb-16 md:pb-20">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-5">
           {[
             { value: '2 days → 15 min', label: 'Decision time,\nper opportunity' },
             { value: '±2,500 hrs', label: 'Saved per year\nper client' },
             { value: '2–3×', label: 'ROI on annual\nplatform cost' },
           ].map(s => (
-            <div key={s.value} style={{
-              background: NAVY_MID, border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: '16px', padding: '32px',
-            }}>
-              <p style={{ fontWeight: 700, fontSize: '24px', color: '#fff', marginBottom: '12px', lineHeight: 1.2 }}>{s.value}</p>
-              <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em', lineHeight: 1.7, whiteSpace: 'pre-line' }}>{s.label}</p>
+            <div key={s.value} className="bg-navy-mid border border-white/10 rounded-2xl p-6 md:p-8 shrink-0">
+              <p className="font-bold text-xl md:text-2xl text-white mb-2 md:mb-3 leading-tight">{s.value}</p>
+              <p className="text-white/35 text-[9px] md:text-[10px] uppercase tracking-widest leading-relaxed whitespace-pre-line">{s.label}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* ── VIDEO ── */}
-      <section style={{ position: 'relative', zIndex: 10, maxWidth: maxW, margin: '0 auto', padding: `0 ${px} 100px` }}>
-        <div style={{ width: '100%', borderRadius: '20px', overflow: 'hidden', background: '#000', boxShadow: '0 30px 80px rgba(0,0,0,0.6)', border: '1px solid rgba(255,255,255,0.1)' }}>
-          <video controls preload="metadata" style={{ width: '100%', display: 'block', aspectRatio: '16/9' }}>
+      <section className="relative z-10 max-w-[1200px] mx-auto px-6 md:px-10 pb-20 md:pb-24">
+        <div className="w-full rounded-2xl overflow-hidden bg-black shadow-[0_30px_80px_rgba(0,0,0,0.6)] border border-white/10">
+          <video controls preload="metadata" className="w-full block aspect-video">
             <source src="https://files.catbox.moe/ukmsln.mp4" type="video/mp4" />
           </video>
         </div>
       </section>
 
       {/* ── TODAY vs HALO ── */}
-      <section style={{ position: 'relative', zIndex: 10, maxWidth: maxW, margin: '0 auto', padding: `0 ${px} 100px` }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', alignItems: 'start' }}>
-
+      <section className="relative z-10 max-w-[1200px] mx-auto px-6 md:px-10 pb-20 md:pb-24">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-10 items-start">
           {/* TODAY side */}
-          <div style={{ opacity: 0.5 }}>
-            <span style={{
-              display: 'inline-block', border: '1px solid rgba(255,255,255,0.3)',
-              color: 'rgba(255,255,255,0.8)', fontSize: '10px', fontWeight: 700,
-              textTransform: 'uppercase', letterSpacing: '0.12em',
-              padding: '6px 18px', borderRadius: '999px', marginBottom: '24px',
-            }}>Today</span>
-            <div style={{
-              background: 'rgba(255, 255, 255, 0.03)',
-              borderRadius: '24px', padding: '32px',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-            }}>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+          <div className="opacity-70 md:opacity-50 hover:opacity-100 transition-opacity">
+            <span className="inline-block border border-white/30 text-white/80 text-[9px] md:text-[10px] font-bold uppercase tracking-[0.12em] px-4 md:px-4.5 py-1.5 rounded-full mb-6">
+              Today
+            </span>
+            <div className="bg-white/5 rounded-3xl p-6 md:p-8 border border-white/10">
+              <ul className="list-none p-0 m-0 space-y-4">
                 {TODAY_ITEMS.map((item, i) => (
-                  <li key={i} style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', color: 'rgba(255, 255, 255, 0.7)', fontSize: '13px', lineHeight: 1.7, marginBottom: '18px' }}>
-                    <X size={16} style={{ flexShrink: 0, marginTop: '3px', color: 'rgba(255,255,255,0.3)' }} />
+                  <li key={i} className="flex gap-3.5 items-start text-white/70 text-xs md:text-[13px] leading-relaxed">
+                    <X size={16} className="shrink-0 mt-0.5 text-white/30" />
                     {item}
                   </li>
                 ))}
@@ -292,20 +257,14 @@ export const LandingPage: React.FC = () => {
 
           {/* HALO side */}
           <div>
-            <div style={{ marginBottom: '24px', paddingLeft: '10px' }}>
-              <img src="/halo-wordmark.svg" alt="HALO" style={{ height: '28px', width: 'auto' }} />
+            <div className="mb-6 pl-2.5 flex items-center h-[28px]">
+              <img src="/halo-wordmark.svg" alt="HALO" className="h-5 md:h-7 w-auto" />
             </div>
-            <div style={{
-              background: 'rgba(26, 46, 69, 0.6)', 
-              borderRadius: '24px', padding: '32px',
-              border: `1px solid ${YELLOW}40`,
-              backdropFilter: 'blur(10px)',
-              boxShadow: `0 0 40px ${YELLOW}10`,
-            }}>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+            <div className="bg-navy-mid/60 rounded-3xl p-6 md:p-8 border border-yellow/40 backdrop-blur-md shadow-[0_0_40px_rgba(240,255,64,0.06)]">
+              <ul className="list-none p-0 m-0 space-y-4 md:space-y-5">
                 {HALO_ITEMS.map((item, i) => (
-                  <li key={i} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', color: '#fff', fontSize: '14px', lineHeight: 1.7, marginBottom: '20px', fontWeight: 500 }}>
-                    <Check size={18} style={{ flexShrink: 0, marginTop: '3px', color: YELLOW }} />
+                  <li key={i} className="flex gap-4 items-start text-white text-sm leading-relaxed font-medium">
+                    <Check size={18} className="shrink-0 mt-0.5 text-yellow" />
                     {item}
                   </li>
                 ))}
@@ -316,41 +275,28 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* ── MARQUEE PILL ── */}
-      <section style={{ position: 'relative', zIndex: 10, maxWidth: maxW, margin: '0 auto', padding: `0 ${px} 80px` }}>
-        <div style={{
-          display: 'inline-flex', alignItems: 'center',
-          border: `1px solid ${YELLOW}44`,
-          borderRadius: '999px', padding: '8px 24px',
-        }}>
-          <span style={{ color: YELLOW, fontSize: '9px', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+      <section className="relative z-10 max-w-[1200px] mx-auto px-6 md:px-10 pb-16 md:pb-20 text-center">
+        <div className="inline-flex items-center border border-yellow/30 rounded-full px-6 py-2">
+          <span className="text-yellow text-[8px] md:text-[9px] font-bold tracking-widest uppercase text-center w-full">
             + Every pre-contract decision becomes: Structured · Reviewable · Defensible
           </span>
         </div>
       </section>
 
       {/* ── FOOTER ── */}
-      <footer style={{
-        position: 'relative', zIndex: 10,
-        borderTop: '1px solid rgba(255,255,255,0.07)',
-        padding: `40px ${px}`,
-      }}>
-        <div style={{ maxWidth: maxW, margin: '0 auto', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '24px' }}>
-          <img src="/halo-wordmark.svg" alt="HALO" style={{ height: '20px', width: 'auto' }} />
+      <footer className="relative z-10 border-t border-white/10 px-6 md:px-10 py-8 md:py-10">
+        <div className="max-w-[1200px] mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+          <img src="/halo-wordmark.svg" alt="HALO" className="h-4 md:h-5 w-auto" />
 
-          <button style={{
-            border: `2px solid ${YELLOW}`, color: YELLOW,
-            background: 'transparent', fontWeight: 700, fontSize: '9px',
-            letterSpacing: '0.12em', textTransform: 'uppercase',
-            padding: '10px 32px', borderRadius: '999px', cursor: 'pointer',
-          }}>
+          <button className="border-2 border-yellow text-yellow bg-transparent font-bold text-[9px] tracking-widest uppercase px-8 py-2.5 rounded-full hover:bg-yellow/10 transition-colors">
             Request a Demo
           </button>
 
-          <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: '10px' }}>
+          <p className="text-white/20 text-[9px] md:text-[10px] text-center md:text-left">
             © 2026 HALO · Pre-Contract Intelligence for Enterprise Bidding
           </p>
 
-          <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: '10px', textAlign: 'right' }}>
+          <p className="text-white/20 text-[9px] md:text-[10px] text-center md:text-right">
             Albert House, 256-260 Old Street · London EC1V 9DD
           </p>
         </div>

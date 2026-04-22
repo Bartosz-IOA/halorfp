@@ -11,17 +11,15 @@ function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-const NavItem = ({ 
-  to, 
-  icon: Icon, 
-  label, 
-  disabled = false 
-}: { 
-  to: string; 
-  icon: any; 
-  label: string; 
-  disabled?: boolean 
-}) => {
+interface NavItemProps {
+  to: string;
+  icon: any;
+  label: string;
+  disabled?: boolean;
+  onClick?: () => void;
+}
+
+const NavItem: React.FC<NavItemProps> = ({ to, icon: Icon, label, disabled = false, onClick }) => {
   if (disabled) {
     return (
       <div className="flex items-center gap-3 px-3 py-2 text-text-inverse/40 cursor-default group relative">
@@ -35,6 +33,7 @@ const NavItem = ({
   return (
     <NavLink
       to={to}
+      onClick={onClick}
       className={({ isActive }) => cn(
         "flex items-center gap-3 px-3 py-2 transition-fast border-l-3",
         isActive 
@@ -48,7 +47,12 @@ const NavItem = ({
   );
 };
 
-export const Sidebar: React.FC = () => {
+interface SidebarProps {
+  mobileMenuOpen: boolean;
+  setMobileMenuOpen: (open: boolean) => void;
+}
+
+export const Sidebar: React.FC<SidebarProps> = ({ mobileMenuOpen, setMobileMenuOpen }) => {
   const { logout } = useAuthStore();
   const navigate = useNavigate();
 
@@ -57,11 +61,16 @@ export const Sidebar: React.FC = () => {
     navigate('/login');
   };
 
+  const closeMenu = () => setMobileMenuOpen(false);
+
   return (
-    <aside className="w-sidebar bg-navy-primary text-text-inverse fixed inset-y-0 left-0 flex flex-col z-20">
+    <aside className={cn(
+      "w-sidebar bg-navy-primary text-text-inverse fixed inset-y-0 left-0 flex flex-col z-50 transform transition-transform duration-300 ease-in-out md:translate-x-0 shadow-2xl md:shadow-none",
+      mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+    )}>
       {/* Logo Area */}
-      <div className="p-4 mb-4 flex items-center justify-center">
-        <NavLink to="/rfp" className="block pt-2">
+      <div className="p-4 mb-4 flex items-center justify-between md:justify-center">
+        <NavLink to="/rfp" className="block pt-2" onClick={closeMenu}>
           <img src="/halo-wordmark.svg" alt="HALO" className="h-[22px] w-auto" />
         </NavLink>
       </div>
@@ -80,7 +89,7 @@ export const Sidebar: React.FC = () => {
         </div>
         
         <nav className="space-y-1">
-          <NavItem to="/rfp" icon={FileText} label="RFP Analysis" />
+          <NavItem to="/rfp" icon={FileText} label="RFP Analysis" onClick={closeMenu} />
         </nav>
 
         <div className="px-3 mt-6 mb-2">
