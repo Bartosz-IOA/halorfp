@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Download, FileText, ChevronDown, ChevronRight, ChevronLeft, FileArchive, CheckCircle, AlertTriangle, Info, MessageSquare, X, Send } from 'lucide-react';
+import { Download, FileText, ChevronDown, ChevronRight, ChevronLeft, FileArchive, Info, MessageSquare, X, Send } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
