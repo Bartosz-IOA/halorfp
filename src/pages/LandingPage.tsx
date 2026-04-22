@@ -4,9 +4,6 @@ import { NavLink } from 'react-router-dom';
 import { Check, X } from 'lucide-react';
 
 // ─── CONSTANTS ──────────────────────────────────────────────────────────────
-const BG      = '#152238';
-const YELLOW  = '#F0FF40';
-const NAVY_MID = '#1A2E45';
 
 const TOOL_TAGS = ['GO / NO-GO', 'CONTRACT RISK', 'FEE ESTIMATION', 'RFI GENERATION', 'SUPPLIER SELECTION', 'BID LEARNING'];
 const TODAY_ITEMS = [
