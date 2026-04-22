@@ -6,7 +6,8 @@ import { Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const LoginPage: React.FC = () => {
-  const [key, setKey] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showKey, setShowKey] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -18,16 +19,17 @@ export const LoginPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!key.trim()) return;
+    if (!email.trim() || !password.trim()) return;
 
     setIsLoading(true);
     setError(null);
 
     try {
-      await login(key);
+      await login(email, password);
       navigate(from, { replace: true });
-    } catch (err) {
-      setError('Invalid access key. Please try again.');
+    } catch (err: any) {
+      console.error(err);
+      setError(err?.message || 'Invalid email or password. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -59,20 +61,36 @@ export const LoginPage: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label 
-                htmlFor="access-key" 
+                htmlFor="email" 
                 className="block text-sm font-bold text-text-primary mb-2"
               >
-                Access Key
+                Email Address
+              </label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="input mb-4"
+                placeholder="Enter your email"
+                autoFocus
+                disabled={isLoading}
+              />
+
+              <label 
+                htmlFor="password" 
+                className="block text-sm font-bold text-text-primary mb-2"
+              >
+                Password
               </label>
               <div className="relative">
                 <input
-                  id="access-key"
+                  id="password"
                   type={showKey ? "text" : "password"}
-                  value={key}
-                  onChange={(e) => setKey(e.target.value)}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="input pr-10"
-                  placeholder="Enter workspace key"
-                  autoFocus
+                  placeholder="Enter your password"
                   disabled={isLoading}
                 />
                 <button
@@ -91,7 +109,7 @@ export const LoginPage: React.FC = () => {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="bg-red-50 border-l-4 border-status-failed p-3 flex items-start gap-3"
+                  className="bg-red-50 border-l-4 border-status-failed p-3 flex items-start gap-3 overflow-hidden text-clip"
                 >
                   <AlertCircle className="text-status-failed shrink-0" size={18} />
                   <p className="text-text-primary text-xs">{error}</p>
@@ -101,16 +119,16 @@ export const LoginPage: React.FC = () => {
 
             <button
               type="submit"
-              disabled={isLoading || !key.trim()}
+              disabled={isLoading || !email.trim() || !password.trim()}
               className="btn btn-primary w-full h-[44px]"
             >
               {isLoading ? (
                 <>
                   <Loader2 className="animate-spin mr-2" size={20} />
-                  <span>Verifying...</span>
+                  <span>Authenticating...</span>
                 </>
               ) : (
-                <span>Enter Workspace</span>
+                <span>Sign In</span>
               )}
             </button>
           </form>
