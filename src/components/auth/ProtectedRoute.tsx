@@ -1,0 +1,20 @@
+// src/components/auth/ProtectedRoute.tsx
+import React from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
+import { useAuthStore } from '../../store/useAuthStore';
+
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+}
+
+export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const location = useLocation();
+
+  if (!isAuthenticated) {
+    // Redirect to login with the current location to return to after login
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return <>{children}</>;
+};

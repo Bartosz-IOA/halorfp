@@ -1,0 +1,58 @@
+/* src/styles/base.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-off-white text-text-primary font-sans antialiased;
+    font-family: var(--font-family);
+    font-size: var(--text-base);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold text-navy-primary;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-md font-bold disabled:opacity-50 disabled:cursor-not-allowed;
+    transition: all var(--transition-fast);
+  }
+
+  .btn-primary {
+    @apply bg-yellow text-navy-primary hover:bg-yellow-dark;
+  }
+
+  .btn-secondary {
+    @apply bg-navy-mid text-text-inverse hover:bg-navy-primary;
+  }
+
+  .btn-ghost {
+    @apply bg-transparent text-text-secondary hover:bg-surface-grey;
+  }
+
+  .card {
+    @apply bg-surface-white rounded-lg shadow-card p-6;
+  }
+
+  .input {
+    @apply w-full px-3 py-2 rounded-md border border-border bg-surface-white text-text-primary;
+    transition: all var(--transition-fast);
+  }
+  .input:focus {
+    outline: none;
+    border-color: var(--color-yellow);
+    box-shadow: 0 0 0 3px rgba(232, 255, 0, 0.2);
+  }
+}
+
+@layer utilities {
+  .transition-fast {
+    transition: all var(--transition-fast);
+  }
+  .transition-base {
+    transition: all var(--transition-base);
+  }
+}
