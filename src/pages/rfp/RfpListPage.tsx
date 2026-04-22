@@ -1,92 +1,110 @@
 // src/pages/rfp/RfpListPage.tsx
 import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Plus, FileText, Clock, ChevronRight, Search, Filter } from 'lucide-react';
+import { Plus, FileText, Clock, ChevronRight, Search, Filter, AlertCircle, RefreshCw } from 'lucide-react';
 import { motion } from 'framer-motion';
-
-interface Analysis {
-  id: string;
-  name: string;
-  status: 'COMPLETE' | 'PROCESSING' | 'FAILED';
-  files: number;
-  date: string;
-  comment?: string;
-}
-
-const MOCK_ANALYSES: Analysis[] = [
-  {
-    id: '1',
-    name: 'Project Horizon RFP - Infrastructure',
-    status: 'COMPLETE',
-    files: 3,
-    date: '2 hours ago',
-    comment: 'Primary focus on the technical requirements for the cloud migration phase.',
-  },
-  {
-    id: '2',
-    name: 'Global Logistics Software Tenders',
-    status: 'PROCESSING',
-    files: 1,
-    date: 'Just now',
-  },
-  {
-    id: '3',
-    name: 'Healthcare Systems Modernization',
-    status: 'FAILED',
-    files: 5,
-    date: '1 day ago',
-    comment: 'Missing core pricing document in the initial upload batch.',
-  },
-];
+import { listAnalyses } from '../../lib/analysisService';
+import type { Analysis } from '../../types/analysis';
 
 const StatusBadge = ({ status }: { status: Analysis['status'] }) => {
   const styles = {
-    COMPLETE: "bg-green-100 text-status-complete",
+    COMPLETE:   "bg-green-100 text-status-complete",
     PROCESSING: "bg-amber-100 text-status-process",
-    FAILED: "bg-red-100 text-status-failed",
+    FAILED:     "bg-red-100 text-status-failed",
   };
-  
   const labels = {
-    COMPLETE: "Complete",
+    COMPLETE:   "Complete",
     PROCESSING: "Analysing",
-    FAILED: "Failed",
+    FAILED:     "Failed",
   };
-
   return (
-    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${styles[status]}`}>
+    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shrink-0 ${styles[status]}`}>
       {labels[status]}
       {status === 'PROCESSING' && <span className="ml-1 animate-pulse">...</span>}
     </span>
   );
 };
 
+const formatDate = (isoString: string): string => {
+  const date = new Date(isoString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMins / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffMins < 1) return 'Just now';
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays < 7) return `${diffDays}d ago`;
+  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+};
+
 export const RfpListPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [analyses, setAnalyses] = useState<Analysis[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Simulate initial loading
-    const timer = setTimeout(() => {
-      setAnalyses(MOCK_ANALYSES);
+  const fetchAnalyses = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await listAnalyses();
+      setAnalyses(data);
+    } catch (err: any) {
+      console.error('Failed to load analyses:', err);
+      setError('Failed to load analyses. Please check your connection and try again.');
+    } finally {
       setLoading(false);
-    }, 1200);
-    return () => clearTimeout(timer);
-  }, []);
+    }
+  };
+
+  useEffect(() => {
+    fetchAnalyses();
+
+    // Auto-refresh every 10s if any analysis is still PROCESSING
+    const interval = setInterval(() => {
+      if (analyses.some(a => a.status === 'PROCESSING')) {
+        fetchAnalyses();
+      }
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [analyses.length]);
+
+  const filtered = analyses.filter(a =>
+    a.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   if (loading) {
     return (
-      <div className="p-8 space-y-4">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="h-24 bg-white rounded-lg animate-pulse border border-border" />
+      <div className="px-4 py-4 md:px-6 md:py-6 space-y-2">
+        {[1, 2, 3].map(i => (
+          <div key={i} className="h-[72px] bg-white rounded-xl animate-pulse border border-border shadow-sm" />
         ))}
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center p-8 text-center mt-8">
+        <AlertCircle size={40} className="text-status-failed mb-4 opacity-60" />
+        <p className="text-navy-primary font-bold mb-1">Could not load analyses</p>
+        <p className="text-text-secondary text-sm mb-6">{error}</p>
+        <button onClick={fetchAnalyses} className="btn btn-primary px-6 flex items-center gap-2">
+          <RefreshCw size={16} />
+          Retry
+        </button>
       </div>
     );
   }
 
   if (analyses.length === 0) {
     return (
-      <div className="h-full flex flex-col items-center justify-center p-4 md:p-8 text-center bg-white my-4 md:m-8 rounded-xl border border-dashed border-border">
+      <div className="flex flex-col items-center justify-center p-8 text-center mt-8 mx-4 rounded-xl border border-dashed border-border bg-white">
         <div className="w-16 h-16 bg-off-white rounded-full flex items-center justify-center mb-6">
           <FileText size={32} className="text-text-secondary opacity-40" />
         </div>
@@ -94,7 +112,7 @@ export const RfpListPage: React.FC = () => {
         <p className="text-text-secondary mb-8 max-w-sm text-sm">
           Upload your first RFP to get started with pre-contract intelligence.
         </p>
-        <NavLink to="/rfp/new" className="btn btn-primary px-8 py-3 w-full sm:w-auto">
+        <NavLink to="/rfp/new" className="btn btn-primary px-8 py-3">
           <Plus size={18} className="mr-2" />
           New Analysis
         </NavLink>
@@ -116,30 +134,43 @@ export const RfpListPage: React.FC = () => {
         </NavLink>
       </div>
 
-      {/* Search + Filter Row — always side-by-side */}
+      {/* Search + Filter Row */}
       <div className="flex gap-2 mb-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" size={14} />
-          <input 
-            type="text" 
-            placeholder="Search analyses..." 
+          <input
+            type="text"
+            placeholder="Search analyses..."
             className="input pl-9 h-9 text-sm"
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
           />
         </div>
         <button className="btn btn-ghost border border-border px-3 h-9 text-sm flex items-center gap-1.5 shrink-0">
           <Filter size={14} />
           <span className="hidden sm:inline">Filter</span>
         </button>
+        <button
+          onClick={fetchAnalyses}
+          className="btn btn-ghost border border-border px-3 h-9 text-sm flex items-center gap-1.5 shrink-0"
+          title="Refresh"
+        >
+          <RefreshCw size={14} />
+        </button>
       </div>
 
       {/* Cards List */}
       <div className="space-y-2">
-        {analyses.map((analysis) => (
+        {filtered.map(analysis => (
           <motion.div
             key={analysis.id}
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            onClick={() => navigate(analysis.status === 'PROCESSING' ? `/rfp/${analysis.id}/processing` : `/rfp/${analysis.id}`)}
+            onClick={() => navigate(
+              analysis.status === 'PROCESSING'
+                ? `/rfp/${analysis.id}/processing`
+                : `/rfp/${analysis.id}`
+            )}
             className="bg-white rounded-xl border border-border px-4 py-3 group hover:bg-surface-grey hover:border-yellow/20 cursor-pointer transition-all duration-200 shadow-sm"
           >
             <div className="flex items-center justify-between gap-3">
@@ -154,10 +185,10 @@ export const RfpListPage: React.FC = () => {
                   <div className="flex items-center gap-2 text-[11px] text-text-secondary mt-0.5">
                     <span className="flex items-center gap-1">
                       <Clock size={10} />
-                      {analysis.date}
+                      {formatDate(analysis.created_at)}
                     </span>
                     <span>·</span>
-                    <span>{analysis.files} files</span>
+                    <span>{analysis.file_names.length} file{analysis.file_names.length !== 1 ? 's' : ''}</span>
                   </div>
                 </div>
               </div>
@@ -166,16 +197,22 @@ export const RfpListPage: React.FC = () => {
                 <ChevronRight size={14} className="text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
             </div>
-            
-            {analysis.comment && (
+
+            {analysis.status === 'FAILED' && analysis.error_message && (
               <div className="mt-2 pt-2 border-t border-border/50">
-                <p className="text-xs text-text-secondary italic line-clamp-1">
-                  "{analysis.comment}"
+                <p className="text-xs text-status-failed italic line-clamp-1">
+                  Error: {analysis.error_message}
                 </p>
               </div>
             )}
           </motion.div>
         ))}
+
+        {filtered.length === 0 && searchQuery && (
+          <div className="text-center py-10 text-text-secondary text-sm">
+            No analyses match "<strong>{searchQuery}</strong>"
+          </div>
+        )}
       </div>
     </div>
   );
