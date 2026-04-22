@@ -103,70 +103,73 @@ export const RfpListPage: React.FC = () => {
   }
 
   return (
-    <div className="p-0 md:p-4 max-w-6xl mx-auto">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 md:mb-8 gap-4">
+    <div className="px-4 py-4 md:px-6 md:py-6 max-w-6xl mx-auto">
+      {/* Header Row */}
+      <div className="flex items-center justify-between mb-4">
         <div>
-          <p className="text-sm text-text-secondary mb-1">{analyses.length} analyses total</p>
-          <p className="text-text-secondary text-sm md:text-base">Review past analyses or start a new one.</p>
+          <p className="text-xs text-text-secondary">{analyses.length} analyses total</p>
+          <p className="text-text-secondary text-xs md:text-sm hidden sm:block">Review past analyses or start a new one.</p>
         </div>
-        <NavLink to="/rfp/new" className="btn btn-primary px-6 py-2.5 w-full sm:w-auto truncate">
-          <Plus size={18} className="mr-2 shrink-0" />
-          New Analysis
+        <NavLink to="/rfp/new" className="btn btn-primary px-4 py-2 text-sm flex items-center gap-1.5 shrink-0">
+          <Plus size={16} className="shrink-0" />
+          <span>New Analysis</span>
         </NavLink>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mb-6">
-        <div className="relative w-full sm:flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" size={16} />
+      {/* Search + Filter Row — always side-by-side */}
+      <div className="flex gap-2 mb-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" size={14} />
           <input 
             type="text" 
             placeholder="Search analyses..." 
-            className="input pl-10 h-10 text-sm"
+            className="input pl-9 h-9 text-sm"
           />
         </div>
-        <button className="btn btn-ghost border border-border w-full sm:w-auto px-4 h-10 text-sm flex items-center justify-center gap-2">
-          <Filter size={16} />
-          Filter
+        <button className="btn btn-ghost border border-border px-3 h-9 text-sm flex items-center gap-1.5 shrink-0">
+          <Filter size={14} />
+          <span className="hidden sm:inline">Filter</span>
         </button>
       </div>
 
-      <div className="space-y-3">
+      {/* Cards List */}
+      <div className="space-y-2">
         {analyses.map((analysis) => (
           <motion.div
             key={analysis.id}
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             onClick={() => navigate(analysis.status === 'PROCESSING' ? `/rfp/${analysis.id}/processing` : `/rfp/${analysis.id}`)}
-            className="card group hover:bg-surface-grey border border-transparent hover:border-yellow/20 cursor-pointer transition-all duration-200"
+            className="bg-white rounded-xl border border-border px-4 py-3 group hover:bg-surface-grey hover:border-yellow/20 cursor-pointer transition-all duration-200 shadow-sm"
           >
-            <div className="flex items-start justify-between">
-              <div className="flex gap-4">
-                <div className="w-10 h-10 rounded bg-off-white flex items-center justify-center text-navy-primary group-hover:bg-white transition-colors">
-                  <FileText size={20} />
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-8 h-8 shrink-0 rounded bg-off-white flex items-center justify-center text-navy-primary group-hover:bg-white transition-colors">
+                  <FileText size={16} />
                 </div>
-                <div>
-                  <h3 className="font-bold text-md mb-1 group-hover:text-navy-mid transition-colors">
+                <div className="min-w-0">
+                  <h3 className="font-bold text-sm text-navy-primary leading-snug truncate group-hover:text-navy-mid transition-colors">
                     {analysis.name}
                   </h3>
-                  <div className="flex items-center gap-4 text-xs text-text-secondary">
+                  <div className="flex items-center gap-2 text-[11px] text-text-secondary mt-0.5">
                     <span className="flex items-center gap-1">
-                      <Clock size={12} />
+                      <Clock size={10} />
                       {analysis.date}
                     </span>
-                    <span>•</span>
+                    <span>·</span>
                     <span>{analysis.files} files</span>
                   </div>
                 </div>
               </div>
-              <div className="flex flex-col items-end gap-2">
+              <div className="flex flex-col items-end gap-1 shrink-0">
                 <StatusBadge status={analysis.status} />
-                <ChevronRight size={16} className="text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity" />
+                <ChevronRight size={14} className="text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
             </div>
             
             {analysis.comment && (
-              <div className="mt-4 pt-4 border-t border-border/50">
-                <p className="text-sm text-text-secondary italic line-clamp-1">
+              <div className="mt-2 pt-2 border-t border-border/50">
+                <p className="text-xs text-text-secondary italic line-clamp-1">
                   "{analysis.comment}"
                 </p>
               </div>
