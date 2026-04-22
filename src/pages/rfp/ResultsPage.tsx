@@ -173,23 +173,24 @@ const GoNoGoRow = ({ data }: { data: typeof GO_NO_GO_DATA[0] }) => {
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden"
           >
-            <div className="mt-2 ml-4 mr-2 mb-4 bg-white border border-border shadow-sm rounded-lg p-4">
-               <div className="grid grid-cols-[2fr_1fr_2fr_1fr] gap-4 mb-2 pb-2 border-b border-border">
-                 <div className="text-[10px] font-bold text-text-secondary uppercase">Question</div>
-                 <div className="text-[10px] font-bold text-text-secondary uppercase">Answer</div>
-                 <div className="text-[10px] font-bold text-text-secondary uppercase">Notes</div>
-                 <div className="text-[10px] font-bold text-text-secondary uppercase text-right">Reference</div>
-               </div>
-               
-               {MOCK_QUESTIONS.map((itm, i) => (
-                 <div key={i} className="grid grid-cols-[2fr_1fr_2fr_1fr] gap-4 py-2 border-b border-border last:border-0 items-start">
-                   <div className="text-xs text-navy-primary">{itm.q}</div>
-                   <div className={cn("text-xs font-bold", itm.a === 'Yes' ? "text-green-600" : "text-red-600")}>{itm.a}</div>
-                   <div className="text-xs text-text-secondary">{itm.notes}</div>
-                   <div className="text-xs text-navy-primary font-medium text-right italic cursor-pointer hover:underline">{itm.ref}</div>
+            <div className="mt-2 ml-2 md:ml-4 mr-2 mb-4 bg-white border border-border shadow-sm rounded-lg overflow-x-auto">
+               <div className="p-4 min-w-[600px]">
+                 <div className="grid grid-cols-[2fr_1fr_2fr_1fr] gap-4 mb-2 pb-2 border-b border-border">
+                   <div className="text-[10px] font-bold text-text-secondary uppercase">Question</div>
+                   <div className="text-[10px] font-bold text-text-secondary uppercase">Answer</div>
+                   <div className="text-[10px] font-bold text-text-secondary uppercase">Notes</div>
+                   <div className="text-[10px] font-bold text-text-secondary uppercase text-right">Reference</div>
                  </div>
-               ))}
-               
+                 
+                 {MOCK_QUESTIONS.map((itm, i) => (
+                   <div key={i} className="grid grid-cols-[2fr_1fr_2fr_1fr] gap-4 py-2 border-b border-border last:border-0 items-start">
+                     <div className="text-xs text-navy-primary">{itm.q}</div>
+                     <div className={cn("text-xs font-bold", itm.a === 'Yes' ? "text-green-600" : "text-red-600")}>{itm.a}</div>
+                     <div className="text-xs text-text-secondary">{itm.notes}</div>
+                     <div className="text-xs text-navy-primary font-medium text-right italic cursor-pointer hover:underline">{itm.ref}</div>
+                   </div>
+                 ))}
+               </div>
             </div>
           </motion.div>
         )}
@@ -206,7 +207,7 @@ export const ResultsPage: React.FC = () => {
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
 
   return (
-    <div className="min-h-full p-6 lg:p-8 font-sans bg-off-white">
+    <div className="min-h-full p-4 md:p-6 lg:p-8 font-sans bg-off-white">
       <div className="max-w-[1400px] mx-auto space-y-6">
 
         {/* --- Top Hero & Stats Block --- */}
@@ -227,15 +228,15 @@ export const ResultsPage: React.FC = () => {
 
             <div className="flex flex-col mb-6 text-xs border-y border-border py-2">
               {MOCK_BREAKDOWN_DATA.map((item, i) => (
-                <div key={i} className="grid grid-cols-[150px_1fr_40px] gap-x-6 py-2 border-b border-border/50 last:border-0 items-start">
-                  <div className="font-bold text-text-secondary mt-1">{item.label}</div>
-                  <div className="text-navy-primary whitespace-pre-line leading-relaxed">{item.value}</div>
+                <div key={i} className="flex flex-col md:grid md:grid-cols-[150px_1fr_40px] gap-1 md:gap-x-6 py-3 md:py-2 border-b border-border/50 last:border-0 md:items-start relative">
+                  <div className="font-bold text-text-secondary pr-8 md:pr-0 md:mt-1">{item.label}</div>
+                  <div className="text-navy-primary whitespace-pre-line leading-relaxed text-[13px] md:text-xs">{item.value}</div>
                   
-                  <div className="group relative flex justify-end">
-                    <Info size={16} className="text-text-secondary/50 cursor-help mt-1 hover:text-navy-primary transition-colors" />
+                  <div className="group absolute top-3 right-0 md:relative md:top-auto md:flex md:justify-end">
+                    <Info size={16} className="text-text-secondary/50 cursor-help md:mt-1 hover:text-navy-primary transition-colors" />
                     
                     {/* Tooltip Popup */}
-                    <div className="absolute right-0 bottom-full mb-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 bg-navy-mid text-white p-4 rounded-xl shadow-modal z-50 w-[320px] pointer-events-none before:content-[''] before:absolute before:top-[100%] before:right-[5px] before:border-[6px] before:border-transparent before:border-t-navy-mid">
+                    <div className="absolute right-0 top-full mt-2 md:top-auto md:bottom-full md:mb-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 bg-navy-mid text-white p-4 rounded-xl shadow-modal z-50 w-[280px] sm:w-[320px] pointer-events-none md:before:content-[''] md:before:absolute md:before:top-[100%] md:before:right-[5px] md:before:border-[6px] md:before:border-transparent md:before:border-t-navy-mid">
                        <p className="font-bold text-[10px] text-yellow uppercase tracking-widest mb-2 border-b border-white/10 pb-2">Reference Note</p>
                        <p className="text-xs text-white/90 leading-relaxed mb-3 text-left">{item.note}</p>
                        <div className="flex justify-between items-center text-[10px]">
@@ -249,12 +250,12 @@ export const ResultsPage: React.FC = () => {
             </div>
 
             {/* Building Grid Table */}
-            <div className="mb-6 border border-border rounded-lg overflow-hidden bg-white text-xs shadow-sm">
-              <table className="w-full text-left border-collapse">
+            <div className="mb-6 border border-border rounded-lg overflow-x-auto bg-white text-xs shadow-sm">
+              <table className="w-full text-left border-collapse min-w-[500px]">
                 <thead className="bg-surface-grey border-b border-border">
                   <tr>
-                    <th className="px-4 py-2 font-bold text-text-secondary border-r border-border w-[200px]">Building</th>
-                    <th className="px-4 py-2 font-bold text-text-secondary border-r border-border w-[180px]">Typology</th>
+                    <th className="px-4 py-2 font-bold text-text-secondary border-r border-border w-[40%] md:w-[200px]">Building</th>
+                    <th className="px-4 py-2 font-bold text-text-secondary border-r border-border w-[40%] md:w-[180px]">Typology</th>
                     <th className="px-4 py-2 font-bold text-text-secondary text-right">Area (GFA)</th>
                   </tr>
                 </thead>

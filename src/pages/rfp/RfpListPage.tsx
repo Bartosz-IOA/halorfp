@@ -86,15 +86,15 @@ export const RfpListPage: React.FC = () => {
 
   if (analyses.length === 0) {
     return (
-      <div className="h-full flex flex-col items-center justify-center p-8 text-center bg-white m-8 rounded-xl border border-dashed border-border">
+      <div className="h-full flex flex-col items-center justify-center p-4 md:p-8 text-center bg-white my-4 md:m-8 rounded-xl border border-dashed border-border">
         <div className="w-16 h-16 bg-off-white rounded-full flex items-center justify-center mb-6">
           <FileText size={32} className="text-text-secondary opacity-40" />
         </div>
         <h2 className="text-xl font-bold mb-2">No analyses yet</h2>
-        <p className="text-text-secondary mb-8 max-w-sm">
+        <p className="text-text-secondary mb-8 max-w-sm text-sm">
           Upload your first RFP to get started with pre-contract intelligence.
         </p>
-        <NavLink to="/rfp/new" className="btn btn-primary px-8 py-3">
+        <NavLink to="/rfp/new" className="btn btn-primary px-8 py-3 w-full sm:w-auto">
           <Plus size={18} className="mr-2" />
           New Analysis
         </NavLink>
@@ -103,20 +103,20 @@ export const RfpListPage: React.FC = () => {
   }
 
   return (
-    <div className="p-8 max-w-6xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
+    <div className="p-0 md:p-4 max-w-6xl mx-auto">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 md:mb-8 gap-4">
         <div>
           <p className="text-sm text-text-secondary mb-1">{analyses.length} analyses total</p>
-          <p className="text-text-secondary">Review past analyses or start a new one.</p>
+          <p className="text-text-secondary text-sm md:text-base">Review past analyses or start a new one.</p>
         </div>
-        <NavLink to="/rfp/new" className="btn btn-primary px-6 py-2.5">
-          <Plus size={18} className="mr-2" />
+        <NavLink to="/rfp/new" className="btn btn-primary px-6 py-2.5 w-full sm:w-auto truncate">
+          <Plus size={18} className="mr-2 shrink-0" />
           New Analysis
         </NavLink>
       </div>
 
-      <div className="flex gap-4 mb-6">
-        <div className="relative flex-1">
+      <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mb-6">
+        <div className="relative w-full sm:flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" size={16} />
           <input 
             type="text" 
@@ -124,7 +124,7 @@ export const RfpListPage: React.FC = () => {
             className="input pl-10 h-10 text-sm"
           />
         </div>
-        <button className="btn btn-ghost border border-border px-4 h-10 text-sm flex items-center gap-2">
+        <button className="btn btn-ghost border border-border w-full sm:w-auto px-4 h-10 text-sm flex items-center justify-center gap-2">
           <Filter size={16} />
           Filter
         </button>
