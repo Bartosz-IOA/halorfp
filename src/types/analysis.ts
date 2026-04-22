@@ -9,6 +9,7 @@ export type AnalysisStatus = 'PROCESSING' | 'COMPLETE' | 'FAILED';
 export interface Analysis {
   id: string;
   user_id: string;
+  org_id: string | null;
   name: string;
   comment: string | null;
   created_at: string;

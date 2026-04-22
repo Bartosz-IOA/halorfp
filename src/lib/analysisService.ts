@@ -47,6 +47,7 @@ export async function getSignedUrl(path: string): Promise<string> {
  */
 export async function createAnalysis(params: {
   userId: string;
+  orgId?: string;
   name: string;
   comment: string;
   fileUrls: string[];
@@ -57,6 +58,7 @@ export async function createAnalysis(params: {
     .from('analyses')
     .insert({
       user_id: params.userId,
+      org_id: params.orgId || null,
       name: params.name,
       comment: params.comment || null,
       status: 'PROCESSING',

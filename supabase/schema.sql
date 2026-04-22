@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS public.analyses (
   -- Identity
   id              UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id         UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  org_id          UUID, -- Optional: used if sharing with an organization
 
   -- Submission metadata
   name            TEXT NOT NULL,
@@ -76,6 +77,35 @@ CREATE POLICY "Service role can update analyses"
   WITH CHECK (true);
 
 -- ============================================================
+-- NOTE ON ORGANIZATION SHARING:
+-- If you want to enable team-wide sharing of analyses, you will 
+-- need an organizations structure. A basic approach would be:
+--
+-- CREATE TABLE public.organizations (
+--   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+--   name TEXT NOT NULL
+-- );
+-- 
+-- CREATE TABLE public.organization_members (
+--   org_id UUID REFERENCES public.organizations(id) ON DELETE CASCADE,
+--   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+--   role TEXT NOT NULL DEFAULT 'member',
+--   PRIMARY KEY (org_id, user_id)
+-- );
+--
+-- Then, drop the "Users can view own analyses" policy and replace with:
+-- CREATE POLICY "Users can view own or org analyses"
+--   ON public.analyses FOR SELECT
+--   USING (
+--     auth.uid() = user_id OR 
+--     (org_id IS NOT NULL AND EXISTS (
+--       SELECT 1 FROM public.organization_members 
+--       WHERE organization_members.org_id = analyses.org_id 
+--       AND organization_members.user_id = auth.uid()
+--     ))
+--   );
+-- ============================================================
+
 -- DONE — Verify with:
 -- SELECT * FROM public.analyses LIMIT 1;
 -- ============================================================
