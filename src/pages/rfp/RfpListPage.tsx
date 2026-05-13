@@ -1,8 +1,9 @@
 // src/pages/rfp/RfpListPage.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Plus, FileText, Clock, ChevronRight, Search, Filter } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { EDGNEX_DEMO_ANALYSIS_ID, useEdgnexDemoStore } from '../../store/useEdgnexDemoStore';
 
 interface Analysis {
   id: string;
@@ -14,6 +15,15 @@ interface Analysis {
 }
 
 const MOCK_ANALYSES: Analysis[] = [
+  {
+    id: EDGNEX_DEMO_ANALYSIS_ID,
+    name: 'EDGNEX Data Centres (Dhahran & Dammam Tech)',
+    status: 'COMPLETE',
+    files: 5,
+    date: '23 Jun 2024',
+    comment:
+      'Decline · 30/300 (10%) · hyperscale DC, Lead Consultant/AOR, compressed programme & commercial exposures.',
+  },
   {
     id: '1',
     name: 'Project Horizon RFP - Infrastructure',
@@ -62,15 +72,19 @@ const StatusBadge = ({ status }: { status: Analysis['status'] }) => {
 
 export const RfpListPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
-  const [analyses, setAnalyses] = useState<Analysis[]>([]);
   const navigate = useNavigate();
+  const isEdgnexVisible = useEdgnexDemoStore((s) => s.isVisible);
+
+  const analyses = useMemo(
+    () =>
+      MOCK_ANALYSES.filter(
+        (a) => a.id !== EDGNEX_DEMO_ANALYSIS_ID || isEdgnexVisible
+      ),
+    [isEdgnexVisible]
+  );
 
   useEffect(() => {
-    // Simulate initial loading
-    const timer = setTimeout(() => {
-      setAnalyses(MOCK_ANALYSES);
-      setLoading(false);
-    }, 1200);
+    const timer = setTimeout(() => setLoading(false), 1200);
     return () => clearTimeout(timer);
   }, []);
 

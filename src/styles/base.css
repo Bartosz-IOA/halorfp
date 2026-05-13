@@ -56,3 +56,18 @@
     transition: all var(--transition-base);
   }
 }
+
+/* EDGNEX report — print-friendly layout */
+@media print {
+  body {
+    background: #fff !important;
+  }
+  .edgnex-print-hide {
+    display: none !important;
+  }
+  .edgnex-print-static {
+    position: static !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+}

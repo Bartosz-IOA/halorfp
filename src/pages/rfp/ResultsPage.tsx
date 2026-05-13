@@ -1,30 +1,34 @@
 import React, { useState } from 'react';
-import { Download, FileText, ChevronDown, ChevronRight, ChevronLeft, FileArchive, Info, MessageSquare, X, Send } from 'lucide-react';
+import { Navigate, useParams } from 'react-router-dom';
+import { Download, FileText, FileArchive, Info, MessageSquare, X, Send } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
+import {
+  cn,
+  AccordionSection,
+  IndicatorCard,
+  GoNoGoRow,
+} from '../../components/rfp/ResultPrimitives';
+import type { GoNoGoRowData } from '../../types/rfpAssessment';
+import { EdgnexDataCentresResults } from './EdgnexDataCentresResults';
+import { EDGNEX_DEMO_ANALYSIS_ID, useEdgnexDemoStore } from '../../store/useEdgnexDemoStore';
 
 // --- MOCK DATA ---
-const GO_NO_GO_DATA = [
-  { id: '1', name: 'Client relationship', score: 10, max: 30, text: 'C — Bid but not won', color: 'bg-amber-500' },
-  { id: '2', name: 'Scope', score: 30, max: 30, text: 'A — Lead Design Consulta...', color: 'bg-green-500' },
-  { id: '3', name: 'Project type', score: 20, max: 30, text: 'B — Commercial / Public / ...', color: 'bg-amber-500' },
-  { id: '4', name: 'Stages', score: 30, max: 30, text: 'A — Full Design and Site', color: 'bg-green-500' },
-  { id: '5', name: 'Programme', score: 30, max: 30, text: 'A — Realistic / Achievable', color: 'bg-green-500' },
-  { id: '6', name: 'DSA resource capacity', score: 0, max: 30, text: '— Unknown / Not confirmed', color: 'bg-slate-400' },
-  { id: '7', name: 'Quality of RFP', score: 30, max: 30, text: 'A — Excellent information p...', color: 'bg-green-500' },
-  { id: '8', name: 'Prior knowledge of RFP', score: 30, max: 30, text: 'A — Yes (director briefing h...', color: 'bg-green-500' },
-  { id: '9', name: 'Tender bonds / securities', score: -100, max: 30, text: 'B — Required (bonds, guar...', color: 'bg-red-500', isBlocker: true },
-  { id: '10', name: 'Submission timeline', score: 0, max: 30, text: 'B — Due less than two wee...', color: 'bg-slate-400' },
+const MOCK_QUESTIONS = [
+  { q: 'Is the deadline achievable?', a: 'No', notes: 'Lapsed deadline. 627 days overdue.', ref: 'Sec 1.2' },
+  { q: 'Are tender bonds required?', a: 'Yes', notes: 'Mandatory securities explicitly requested.', ref: 'Appendix B' },
 ];
 
-const MOCK_QUESTIONS = [
-  { q: "Is the deadline achievable?", a: "No", notes: "Lapsed deadline. 627 days overdue.", ref: "Sec 1.2" },
-  { q: "Are tender bonds required?", a: "Yes", notes: "Mandatory securities explicitly requested.", ref: "Appendix B" },
+const GO_NO_GO_DATA: GoNoGoRowData[] = [
+  { id: '1', name: 'Client relationship', score: 10, max: 30, text: 'C — Bid but not won', color: 'bg-amber-500', details: MOCK_QUESTIONS },
+  { id: '2', name: 'Scope', score: 30, max: 30, text: 'A — Lead Design Consulta...', color: 'bg-green-500', details: MOCK_QUESTIONS },
+  { id: '3', name: 'Project type', score: 20, max: 30, text: 'B — Commercial / Public / ...', color: 'bg-amber-500', details: MOCK_QUESTIONS },
+  { id: '4', name: 'Stages', score: 30, max: 30, text: 'A — Full Design and Site', color: 'bg-green-500', details: MOCK_QUESTIONS },
+  { id: '5', name: 'Programme', score: 30, max: 30, text: 'A — Realistic / Achievable', color: 'bg-green-500', details: MOCK_QUESTIONS },
+  { id: '6', name: 'DSA resource capacity', score: 0, max: 30, text: '— Unknown / Not confirmed', color: 'bg-slate-400', details: MOCK_QUESTIONS },
+  { id: '7', name: 'Quality of RFP', score: 30, max: 30, text: 'A — Excellent information p...', color: 'bg-green-500', details: MOCK_QUESTIONS },
+  { id: '8', name: 'Prior knowledge of RFP', score: 30, max: 30, text: 'A — Yes (director briefing h...', color: 'bg-green-500', details: MOCK_QUESTIONS },
+  { id: '9', name: 'Tender bonds / securities', score: -100, max: 30, text: 'B — Required (bonds, guar...', color: 'bg-red-500', isBlocker: true, details: MOCK_QUESTIONS },
+  { id: '10', name: 'Submission timeline', score: 0, max: 30, text: 'B — Due less than two wee...', color: 'bg-slate-400', details: MOCK_QUESTIONS },
 ];
 
 const MOCK_BREAKDOWN_DATA = [
@@ -48,163 +52,21 @@ const MOCK_PROJECT_IMAGES = [
   { url: 'https://images.unsplash.com/photo-1621293954908-907159247fc8?q=80&w=800&auto=format&fit=crop', desc: 'Academy Training Center', ref: 'Ref 2.4' }
 ];
 
-// --- COMPONENTS ---
-
-const IndicatorCard = ({ label, value, subtext, alert }: { label: string, value: React.ReactNode, subtext?: React.ReactNode, alert?: boolean }) => (
-  <div className={cn(
-    "flex flex-col p-4 rounded-xl border",
-    alert ? "bg-red-50 border-red-200" : "bg-white border-border shadow-sm"
-  )}>
-    <p className={cn("text-[9px] font-bold uppercase tracking-widest mb-1", alert ? "text-red-700" : "text-text-secondary")}>
-      {label}
-    </p>
-    <div className={cn("text-2xl font-bold mb-1", alert ? "text-red-600" : "text-navy-primary")}>
-      {value}
-    </div>
-    {subtext && <div className={cn("text-xs", alert ? "text-red-600/80" : "text-text-secondary")}>{subtext}</div>}
-  </div>
-);
-
-const AccordionSection = ({ 
-  title, 
-  number, 
-  summaryPill, 
-  defaultExpanded = false, 
-  children 
-}: { 
-  title: string, 
-  number?: string, 
-  summaryPill?: React.ReactNode, 
-  defaultExpanded?: boolean, 
-  children?: React.ReactNode 
-}) => {
-  const [expanded, setExpanded] = useState(defaultExpanded);
-
-  return (
-    <div className="bg-white rounded-xl border border-border shadow-sm overflow-hidden mb-4">
-      <button 
-        onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between p-5 hover:bg-surface-grey transition-colors text-left"
-      >
-        <div className="flex items-center gap-4">
-          {number && <span className="text-text-secondary font-mono text-sm">{number}</span>}
-          <h3 className="font-bold text-navy-primary text-md">{title}</h3>
-        </div>
-        <div className="flex items-center gap-4">
-          {summaryPill && <div>{summaryPill}</div>}
-          <div className="text-text-secondary">
-            {expanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
-          </div>
-        </div>
-      </button>
-      
-      <AnimatePresence initial={false}>
-        {expanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
-          >
-            <div className="p-5 border-t border-border bg-off-white/50">
-              {children}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-};
-
-// --- SUB-SECTIONS ---
-
-const GoNoGoRow = ({ data }: { data: typeof GO_NO_GO_DATA[0] }) => {
-  const [open, setOpen] = useState(false);
-  
-  // Calculate width % based on positive score for the bar
-  const widthPercent = data.score > 0 ? (data.score / data.max) * 100 : data.score === 0 ? 0 : 100;
-  
-  return (
-    <div className="mb-2">
-      <div 
-        className={cn(
-          "grid grid-cols-[1fr_2fr_120px_24px] gap-3 items-center p-2 rounded-lg cursor-pointer hover:bg-surface-grey transition-colors",
-          open && "bg-surface-grey"
-        )}
-        onClick={() => setOpen(!open)}
-      >
-        <div className="text-xs text-navy-primary font-medium truncate pr-2">{data.name}</div>
-        
-        {/* Progress Bar Area */}
-        <div className="relative h-1.5 bg-border rounded-full overflow-hidden flex items-center">
-           {data.isBlocker ? (
-             <div className="absolute left-0 top-0 bottom-0 w-full bg-red-600 rounded-full" />
-           ) : (
-             <div 
-                className={cn("absolute left-0 top-0 bottom-0 rounded-full transition-all duration-500", data.color)} 
-                style={{ width: `${widthPercent}%` }} 
-             />
-           )}
-        </div>
-        
-        {/* Score & Text Area */}
-        <div className="text-right">
-          <div className={cn("text-xs font-bold", data.isBlocker ? "text-red-600" : data.score === 0 ? "text-slate-500" : "text-green-600")}>
-            {data.isBlocker ? "-100 blocker" : `${data.score} / ${data.max}`}
-          </div>
-          <div className="text-[9px] text-text-secondary truncate">{data.text}</div>
-        </div>
-
-        {/* Dropdown Icon */}
-        <div className="flex justify-end items-center h-full">
-          <ChevronLeft 
-            size={16} 
-            className={cn("text-text-secondary/60 transition-transform duration-300", open ? "-rotate-90" : "rotate-0")} 
-          />
-        </div>
-      </div>
-      
-      {/* Dropdown Details Table */}
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden"
-          >
-            <div className="mt-2 ml-2 md:ml-4 mr-2 mb-4 bg-white border border-border shadow-sm rounded-lg overflow-x-auto">
-               <div className="p-4 min-w-[600px]">
-                 <div className="grid grid-cols-[2fr_1fr_2fr_1fr] gap-4 mb-2 pb-2 border-b border-border">
-                   <div className="text-[10px] font-bold text-text-secondary uppercase">Question</div>
-                   <div className="text-[10px] font-bold text-text-secondary uppercase">Answer</div>
-                   <div className="text-[10px] font-bold text-text-secondary uppercase">Notes</div>
-                   <div className="text-[10px] font-bold text-text-secondary uppercase text-right">Reference</div>
-                 </div>
-                 
-                 {MOCK_QUESTIONS.map((itm, i) => (
-                   <div key={i} className="grid grid-cols-[2fr_1fr_2fr_1fr] gap-4 py-2 border-b border-border last:border-0 items-start">
-                     <div className="text-xs text-navy-primary">{itm.q}</div>
-                     <div className={cn("text-xs font-bold", itm.a === 'Yes' ? "text-green-600" : "text-red-600")}>{itm.a}</div>
-                     <div className="text-xs text-text-secondary">{itm.notes}</div>
-                     <div className="text-xs text-navy-primary font-medium text-right italic cursor-pointer hover:underline">{itm.ref}</div>
-                   </div>
-                 ))}
-               </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-};
-
-
 // --- MAIN PAGE ---
 
 export const ResultsPage: React.FC = () => {
+  const { id } = useParams();
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const isEdgnexVisible = useEdgnexDemoStore((s) => s.isVisible);
+
+  if (id === EDGNEX_DEMO_ANALYSIS_ID && !isEdgnexVisible) {
+    return <Navigate to="/rfp" replace />;
+  }
+
+  if (id === EDGNEX_DEMO_ANALYSIS_ID) {
+    return <EdgnexDataCentresResults />;
+  }
 
   return (
     <div className="min-h-full p-4 md:p-6 lg:p-8 font-sans bg-off-white">
