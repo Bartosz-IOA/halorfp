@@ -14,6 +14,7 @@ import {
   useEdgnexSectionExpandBinding,
 } from '../../contexts/EdgnexReportNavContext';
 import {
+  EDGNEX_CLIENT_NAME,
   EDGNEX_EXEC_SUMMARY,
   EDGNEX_GENERATED_LABEL,
   EDGNEX_GO_NO_GO,
@@ -351,9 +352,17 @@ const EdgnexDataCentresResultsContent: React.FC = () => {
               <p className="text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em]">
                 RFP intelligence
               </p>
-              <h1 className="mt-1 text-2xl sm:text-3xl font-bold text-navy-primary tracking-tight leading-tight">
-                EDGNEX Data Centres
-              </h1>
+              <div className="mt-1 flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-x-3 sm:gap-y-0.5">
+                <h1 className="text-2xl sm:text-3xl font-bold text-navy-primary tracking-tight leading-tight">
+                  EDGNEX Data Centres
+                </h1>
+                <span className="hidden sm:inline text-border/80 font-light select-none" aria-hidden>
+                  |
+                </span>
+                <p className="text-base sm:text-lg font-semibold text-navy-mid leading-snug">
+                  {EDGNEX_CLIENT_NAME}
+                </p>
+              </div>
               <p className="text-sm text-text-secondary mt-1.5">
                 Dhahran & Dammam Tech · {EDGNEX_GENERATED_LABEL}
               </p>
@@ -475,11 +484,29 @@ const EdgnexDataCentresResultsContent: React.FC = () => {
               </p>
             </CommentAnchor>
 
-            <h3 className="text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em] mb-4">
+            <h3 className="text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em] mb-3">
+              Key facts
+            </h3>
+            <div className="mb-6">
+              <ReferenceInfoList
+                dense
+                commentPrefix="overview-facts"
+                commentSectionLabel="Overview"
+                rows={EDGNEX_KEY_FACTS.map((item) => ({
+                  label: item.label,
+                  value: item.value,
+                  referenceNote: item.note,
+                  referenceSource: item.ref,
+                }))}
+              />
+            </div>
+
+            <h3 className="text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em] mb-3">
               Executive summary
             </h3>
-            <div className="mb-10">
+            <div className="mb-6">
               <ReferenceInfoList
+                dense
                 commentPrefix="overview-exec"
                 commentSectionLabel="Overview"
                 rows={EDGNEX_EXEC_SUMMARY.map((block) =>
@@ -499,29 +526,6 @@ const EdgnexDataCentresResultsContent: React.FC = () => {
               />
             </div>
 
-            <div className="my-8 flex items-center gap-3">
-              <div className="h-px flex-1 bg-border/70" />
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary whitespace-nowrap">
-                Supporting detail
-              </span>
-              <div className="h-px flex-1 bg-border/70" />
-            </div>
-
-            <h3 className="text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em] mb-4">
-              Key facts
-            </h3>
-            <div className="mb-8">
-              <ReferenceInfoList
-                commentPrefix="overview-facts"
-                commentSectionLabel="Overview"
-                rows={EDGNEX_KEY_FACTS.map((item) => ({
-                  label: item.label,
-                  value: item.value,
-                  referenceNote: item.note,
-                  referenceSource: item.ref,
-                }))}
-              />
-            </div>
 
             <h3 className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary">
               Next steps & action items

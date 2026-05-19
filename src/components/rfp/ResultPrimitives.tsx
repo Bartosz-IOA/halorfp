@@ -80,11 +80,14 @@ export const ReferenceInfoList = ({
   rows,
   commentPrefix,
   commentSectionLabel,
+  dense = false,
 }: {
   rows: ReferenceInfoListRow[];
   /** When set, each row becomes its own comment target. */
   commentPrefix?: string;
   commentSectionLabel?: string;
+  /** Tighter row padding for long lists (e.g. overview executive summary / key facts). */
+  dense?: boolean;
 }) => {
   const [pinnedRow, setPinnedRow] = useState<number | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -112,11 +115,28 @@ export const ReferenceInfoList = ({
         const isPinned = pinnedRow === idx;
 
         const rowInner = (
-          <div className="relative flex items-start gap-3 border-b border-border/70 px-4 py-3.5 last:border-b-0 sm:gap-4 sm:px-5 sm:py-4">
-            <div className="w-[132px] shrink-0 pt-0.5 text-[11px] font-bold uppercase leading-snug tracking-wide text-text-secondary sm:w-[172px]">
+          <div
+            className={cn(
+              'relative flex items-start border-b border-border/70 px-3 last:border-b-0 sm:px-4',
+              dense ? 'gap-2 py-1.5 sm:gap-2.5 sm:py-2' : 'gap-2.5 py-3.5 sm:gap-3 sm:py-4',
+            )}
+          >
+            <div
+              className={cn(
+                'shrink-0 pt-0.5 text-[11px] font-bold uppercase leading-snug tracking-wide text-text-secondary',
+                dense ? 'w-[120px] sm:w-[156px]' : 'w-[132px] sm:w-[172px]',
+              )}
+            >
               {row.label}
             </div>
-            <div className="min-w-0 flex-1 break-words text-xs leading-relaxed text-navy-primary sm:text-sm">{row.value}</div>
+            <div
+              className={cn(
+                'min-w-0 flex-1 break-words text-navy-primary',
+                dense ? 'text-xs leading-snug sm:text-[13px]' : 'text-xs leading-relaxed sm:text-sm',
+              )}
+            >
+              {row.value}
+            </div>
             {hasRef ? (
               <div className="group/kftip relative shrink-0">
                 <button
