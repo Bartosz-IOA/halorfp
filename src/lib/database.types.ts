@@ -229,6 +229,8 @@ export type Database = {
       };
     };
 
+    Views: Record<string, never>;
+
     Functions: {
       is_org_member: {
         Args:    { org_id: string };

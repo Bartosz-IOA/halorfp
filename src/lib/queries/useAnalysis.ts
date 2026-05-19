@@ -20,14 +20,18 @@ export function useAnalysis(id: string | undefined) {
         .select(`
           *,
           analysis_files(*),
-          analysis_sections(* order by position asc),
-          analysis_images(* order by position asc)
+          analysis_sections(*),
+          analysis_images(*)
         `)
         .eq('id', id!)
         .single();
 
       if (error) throw error;
-      return data as AnalysisDetail;
+
+      const detail = data as AnalysisDetail;
+      detail.analysis_sections.sort((a, b) => a.position - b.position);
+      detail.analysis_images.sort((a, b) => a.position - b.position);
+      return detail;
     },
   });
 }

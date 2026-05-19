@@ -23,7 +23,7 @@ export function useCreateAnalysis() {
           created_by:      user!.id,
           name:            input.name,
           comment:         input.comment ?? null,
-          status:          'queued',
+          status:          'queued' as const,
         })
         .select('id')
         .single();
