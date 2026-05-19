@@ -1,6 +1,9 @@
 import type { ExecSummaryBlock, GoNoGoRowData } from '../types/rfpAssessment';
+import { EDGNEX_FEE_PORTFOLIO_DESIGN_FEE } from './edgnexFeeEstimation';
 
 export const EDGNEX_GENERATED_LABEL = 'Generated 23/06/2024';
+
+export const EDGNEX_CLIENT_NAME = 'Damac Properties Co. LLC';
 
 export const EDGNEX_EXEC_SUMMARY: ExecSummaryBlock[] = [
   {
@@ -36,6 +39,16 @@ export const EDGNEX_EXEC_SUMMARY: ExecSummaryBlock[] = [
       summary: 'Programme & bid timing',
       detail:
         'Staged design programme and construction duration are defined in the Services Brief; the email thread records correspondence on how little time may be available to submit after issuance.',
+    },
+  },
+  {
+    heading: 'Design fee (indicative)',
+    body: `Portfolio-level design fee is estimated at ${EDGNEX_FEE_PORTFOLIO_DESIGN_FEE} across 100,000 m² combined GFA (50,000 m² per site), using tier-based CAPEX bands at 5.5% with discipline splits per the fee model.`,
+    reference: {
+      citations: 'Fee_Generator_Rev00.xlsx — Master Con Cost; Fee model portfolio roll-up',
+      summary: 'Fee estimation model',
+      detail:
+        'Construction cost density from Fee_Generator master costs (USD), converted at 3.67 AED/USD; design fee percentage follows CAPEX tier bands; portfolio total matches Dhahran and Dammam asset roll-up.',
     },
   },
   {
@@ -93,6 +106,12 @@ export const EDGNEX_KEY_FACTS: { label: string; value: string; note: string; ref
     ref: 'Services Brief Summary.pdf, p.3–4, 14',
   },
   {
+    label: 'Design fee (indicative)',
+    value: EDGNEX_FEE_PORTFOLIO_DESIGN_FEE,
+    note: 'Portfolio total across 100,000 m² GFA (50,000 m² per site); tier-based CAPEX at 5.5% per fee model.',
+    ref: 'Fee_Generator_Rev00.xlsx — Fee model portfolio roll-up',
+  },
+  {
     label: 'Decision rationale',
     value: 'Low maximum score potential (<50%) and multiple unresolved high/critical risks',
     note: 'Current score 30/300 (10%); max achievable 120/300 (40%).',
@@ -106,14 +125,15 @@ export const EDGNEX_GO_NO_GO: GoNoGoRowData[] = [
     name: 'Client or design partner',
     score: 0,
     max: 30,
-    text: '— No option selected',
-    color: 'bg-slate-400',
+    text: 'No data connected',
+    color: 'bg-slate-300',
+    inputState: 'disconnected',
     details: [
       {
         q: 'How is the client / design partner relationship scored?',
-        a: 'Not scored',
-        notes: 'Mixed / unclear relationship signals; no option locked in matrix.',
-        ref: 'Assessment.xlsx',
+        a: 'Not connected',
+        notes: 'CRM / relationship data stream is not configured for this workspace yet.',
+        ref: '—',
       },
     ],
   },
@@ -172,6 +192,7 @@ export const EDGNEX_GO_NO_GO: GoNoGoRowData[] = [
     max: 30,
     text: '— No option selected',
     color: 'bg-slate-400',
+    inputState: 'unselected',
     details: [
       {
         q: 'Is the programme assessed as realistic?',
@@ -183,17 +204,18 @@ export const EDGNEX_GO_NO_GO: GoNoGoRowData[] = [
   },
   {
     id: '6',
-    name: "DSA's resource capacity",
+    name: 'Resource capacity',
     score: 0,
     max: 30,
-    text: '— No option selected',
-    color: 'bg-slate-400',
+    text: 'No data connected',
+    color: 'bg-slate-300',
+    inputState: 'disconnected',
     details: [
       {
         q: 'Is capacity evidenced?',
-        a: 'Not scored',
-        notes: 'No direct quantitative capacity evidence cited in assessment.',
-        ref: 'Assessment.xlsx',
+        a: 'Not connected',
+        notes: 'Resourcing / capacity API is not connected for this assessment build.',
+        ref: '—',
       },
     ],
   },
@@ -252,7 +274,8 @@ export const EDGNEX_GO_NO_GO: GoNoGoRowData[] = [
     score: 0,
     max: 30,
     text: 'B — Fee proposal due in < two weeks',
-    color: 'bg-slate-400',
+    color: 'bg-red-400',
+    inputState: 'scored',
     details: [
       {
         q: 'Bid period',
@@ -263,6 +286,16 @@ export const EDGNEX_GO_NO_GO: GoNoGoRowData[] = [
     ],
   },
 ];
+
+export const EDGNEX_GO_NO_GO_MAX_POINTS = EDGNEX_GO_NO_GO.reduce((sum, row) => sum + row.max, 0);
+export const EDGNEX_GO_NO_GO_EARNED_POINTS = EDGNEX_GO_NO_GO.reduce((sum, row) => sum + row.score, 0);
+/** Upper bound if neutral / disconnected criteria are resolved favourably (per Assessment.xlsx). */
+export const EDGNEX_GO_NO_GO_MAX_ACHIEVABLE_POINTS = 120;
+
+export function goNoGoScorePercent(earned: number, max: number): number {
+  if (max <= 0) return 0;
+  return Math.round((earned / max) * 1000) / 10;
+}
 
 /** Grouped follow-ups aligned to page sections: sequencing vs checklist. */
 export type EdgnexNextStepsSectionBlock = {

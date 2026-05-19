@@ -1,5 +1,5 @@
 // src/pages/rfp/ProcessingPage.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useParams, NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Loader2, FileText, CheckCircle2 } from 'lucide-react';
@@ -13,60 +13,93 @@ const STEPS = [
   "Formatting results...",
 ];
 
+const TOTAL_DURATION_MS = 4 * 60 * 1000;
+const STEP_DURATION_MS = TOTAL_DURATION_MS / STEPS.length;
+
 export const ProcessingPage: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const { id } = useParams();
   const navigate = useNavigate();
   const isProcessingFromNewFlow = useEdgnexDemoStore((s) => s.isProcessingFromNewFlow);
+  const isEdgnexVisible = useEdgnexDemoStore((s) => s.isVisible);
   const completeDemoProcessing = useEdgnexDemoStore((s) => s.completeDemoProcessing);
+  const stepIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const completionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearTimers = useCallback(() => {
+    if (stepIntervalRef.current) {
+      clearInterval(stepIntervalRef.current);
+      stepIntervalRef.current = null;
+    }
+    if (completionTimerRef.current) {
+      clearTimeout(completionTimerRef.current);
+      completionTimerRef.current = null;
+    }
+  }, []);
+
+  const finishProcessing = useCallback(() => {
+    if (!id) return;
+    if (id === EDGNEX_DEMO_ANALYSIS_ID) {
+      completeDemoProcessing();
+    }
+    navigate(`/rfp/${id}`, { replace: true });
+  }, [id, navigate, completeDemoProcessing]);
+
+  const skipToAnalysis = useCallback(() => {
+    clearTimers();
+    finishProcessing();
+  }, [clearTimers, finishProcessing]);
 
   useEffect(() => {
-    if (id === EDGNEX_DEMO_ANALYSIS_ID && !isProcessingFromNewFlow) {
+    if (id !== EDGNEX_DEMO_ANALYSIS_ID || isProcessingFromNewFlow) return;
+    if (isEdgnexVisible) {
+      navigate(`/rfp/${EDGNEX_DEMO_ANALYSIS_ID}`, { replace: true });
+    } else {
       navigate('/rfp', { replace: true });
     }
-  }, [id, isProcessingFromNewFlow, navigate]);
+  }, [id, isProcessingFromNewFlow, isEdgnexVisible, navigate]);
 
   useEffect(() => {
     if (!id) return;
     if (id === EDGNEX_DEMO_ANALYSIS_ID && !isProcessingFromNewFlow) return;
 
-    const stepInterval = setInterval(() => {
-      setCurrentStep(prev => (prev < STEPS.length - 1 ? prev + 1 : prev));
-    }, 2500);
+    setCurrentStep(0);
 
-    const completionTimer = setTimeout(() => {
-      if (id === EDGNEX_DEMO_ANALYSIS_ID) {
-        completeDemoProcessing();
-      }
-      navigate(`/rfp/${id}`);
-    }, 12000);
+    stepIntervalRef.current = setInterval(() => {
+      setCurrentStep((prev) => (prev < STEPS.length - 1 ? prev + 1 : prev));
+    }, STEP_DURATION_MS);
 
-    return () => {
-      clearInterval(stepInterval);
-      clearTimeout(completionTimer);
-    };
-  }, [id, navigate, isProcessingFromNewFlow, completeDemoProcessing]);
+    completionTimerRef.current = setTimeout(finishProcessing, TOTAL_DURATION_MS);
+
+    return clearTimers;
+  }, [id, isProcessingFromNewFlow, finishProcessing, clearTimers]);
 
   return (
     <div className="h-[calc(100vh-theme(height.topbar))] flex items-center justify-center p-8 bg-off-white">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="card max-w-md w-full text-center shadow-modal"
       >
         <div className="flex flex-col items-center">
           <div className="relative mb-8">
-            <Loader2 className="w-16 h-16 text-yellow animate-spin" strokeWidth={3} />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-navy-primary shadow-sm">
-                 <FileText size={20} />
+            <Loader2 className="w-16 h-16 text-yellow animate-spin pointer-events-none" strokeWidth={3} />
+            <button
+              type="button"
+              onClick={skipToAnalysis}
+              className="absolute inset-0 flex items-center justify-center rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow focus-visible:ring-offset-2 cursor-pointer"
+              aria-label="Skip to analysis"
+              title="Skip to analysis"
+            >
+              <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-navy-primary shadow-sm hover:bg-surface-grey transition-colors">
+                <FileText size={20} />
               </div>
-            </div>
+            </button>
           </div>
 
           <h2 className="text-xl font-bold text-navy-primary mb-2">Analyzing your documents</h2>
           <p className="text-text-secondary text-sm mb-8">
-            This usually takes 1–3 minutes. We'll notify you when it's ready.
+            This usually takes about 4 minutes. We'll notify you when it's ready.
           </p>
 
           <div className="w-full bg-surface-grey rounded-lg p-6 text-left border border-border">

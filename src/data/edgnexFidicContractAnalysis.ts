@@ -7,7 +7,16 @@ export const EDGNEX_FIDIC_META = {
 export const EDGNEX_FIDIC_INTRO =
   'This review benchmarks the supplied contract against the FIDIC White Book 2017. It summarises contract metadata, top risk items, clause-by-clause comparison, missing protections, and drafting issues identified in the retrieved documents.';
 
-export const EDGNEX_FIDIC_EXEC_SUMMARY = `This RFP document set for the EDGNEX/DAMAC Dhahran and Dammam Data Center Lead Consultancy presents a contract risk profile that DSA Architects must rate as Critical before proceeding to bid. The four most dangerous exposures are: (1) the complete absence of a limitation of liability cap across all retrieved documents, leaving DSA with unlimited exposure on a 50-200 MW hyperscale facility; (2) the requirement under Section 2.1.7.1(d) for DSA to assume AOR liability for all third-party designs without a paid review period or Employer indemnity — a provision that is likely uninsurable under standard PI terms; (3) uncapped delay penalties deducted 'notwithstanding any objections' under Section 9.3H, combined with an Employer discretion to deduct for design deficiencies with no process or cap; and (4) the complete absence of a dispute resolution clause, meaning DSA has no contractual mechanism to challenge deductions, recover withheld payments or resolve disagreements short of litigation. Compounding these structural risks are a material LD basis inconsistency between the Commercial T&Cs and Section 9.3H, an open-ended scope against a fixed lump sum, and the surrender of DSA's proposal IP to DAMAC unconditionally. DSA should not submit a proposal unless DAMAC agrees in pre-bid negotiations to: insert a liability cap, remove the third-party AOR liability assumption, cap and qualify the delay penalty regime, insert a dispute resolution clause, and clarify the LD calculation basis.`;
+/** @deprecated Use EDGNEX_FIDIC_EXEC_SUMMARY_CONTENT for UI. Kept for exports / search. */
+export const EDGNEX_FIDIC_EXEC_SUMMARY = `This RFP document set for the EDGNEX/DAMAC Dhahran and Dammam Data Center Lead Consultancy presents a contract risk profile that DSA Architects must rate as Critical before proceeding to bid.`;
+
+export const EDGNEX_FIDIC_EXEC_SUMMARY_CONTENT = {
+  paragraphs: [
+    'This RFP document set for the EDGNEX/DAMAC Dhahran and Dammam Data Center Lead Consultancy presents a contract risk profile that DSA Architects must rate as Critical before proceeding to bid.',
+    'The dominant exposures are structural: there is no limitation-of-liability cap across the retrieved documents, leaving unlimited exposure on a 50–200 MW hyperscale facility; Section 2.1.7.1(d) requires DSA to assume AOR liability for third-party designs without a paid review period or Employer indemnity; Section 9.3H permits uncapped delay penalties to be deducted notwithstanding objection, with broad Employer discretion over design-related deductions; and no dispute-resolution clause provides a route to challenge withholdings short of litigation. These items are worsened by inconsistent liquidated-damages bases between the Commercial T&Cs and Section 9.3H, open-ended scope against a fixed lump sum, and unconditional surrender of DSA proposal IP to DAMAC.',
+    'On that basis, DSA should treat submission as conditional on pre-bid agreement to a liability cap, removal or qualification of the third-party AOR assumption, a capped and procedurally fair delay-penalty regime, an agreed dispute-resolution mechanism, and written confirmation of the LD calculation basis.',
+  ],
+} as const;
 
 export const EDGNEX_FIDIC_OVERALL_RATING = 'CRITICAL' as const;
 
@@ -339,6 +348,48 @@ export const EDGNEX_FIDIC_CLAUSE_ROWS: FidicClauseRow[] = [
   },
 ];
 
+export type FidicCatalogItem = {
+  id: string;
+  title: string;
+  detail: string;
+  category: string;
+};
+
+function parseEmDashItem(text: string, id: string, category: string): FidicCatalogItem {
+  const sep = text.indexOf(' — ');
+  if (sep === -1) return { id, title: text, detail: '', category };
+  return {
+    id,
+    title: text.slice(0, sep).trim(),
+    detail: text.slice(sep + 3).trim(),
+    category,
+  };
+}
+
+function parseColonItem(text: string, id: string): FidicCatalogItem {
+  const sep = text.indexOf(': ');
+  const title = sep === -1 ? text.trim() : text.slice(0, sep).trim();
+  return {
+    id,
+    title,
+    detail: sep === -1 ? '' : text.slice(sep + 2).trim(),
+    category: draftingIssueCategory(title),
+  };
+}
+
+function draftingIssueCategory(title: string): string {
+  const t = title.toLowerCase();
+  if (t.includes('inconsistency') || t.includes('inconsistent')) return 'Inconsistency';
+  if (t.includes('tbc')) return 'Unresolved scope';
+  if (t.includes('not retrieved') || t.includes('cross-reference') || t.includes('article')) {
+    return 'Missing document';
+  }
+  if (t.includes('revision table') || t.includes('version-control')) return 'Document control';
+  if (t.includes('provided later')) return 'Missing input';
+  if (t.includes('payment') || t.includes('milestone')) return 'Commercial ambiguity';
+  return 'Drafting gap';
+}
+
 export const EDGNEX_FIDIC_MISSING_PROTECTIONS: string[] = [
   'Limitation of liability cap — no clause found in any retrieved document; DSA faces unlimited liability for all claims arising from the Services',
   'Consequential and indirect loss exclusion — no clause found; DSA is exposed to claims for loss of data centre revenue, business interruption and third-party losses on a 50-200 MW hyperscale facility',
@@ -356,6 +407,10 @@ export const EDGNEX_FIDIC_MISSING_PROTECTIONS: string[] = [
   'Standard of care definition — no clause found defining the standard of care (reasonable skill and care vs fitness for purpose); the Uptime Tier III and TIA-942 compliance requirements could be interpreted as fitness-for-purpose obligations',
 ];
 
+export const EDGNEX_FIDIC_MISSING_PROTECTION_ITEMS: FidicCatalogItem[] = EDGNEX_FIDIC_MISSING_PROTECTIONS.map(
+  (text, i) => parseEmDashItem(text, `missing-${i + 1}`, 'Not in retrieved pack'),
+);
+
 export const EDGNEX_FIDIC_DRAFTING_ERRORS: string[] = [
   "LD basis inconsistency: Commercial Qualifications xlsx specifies LD at '0.5% of the Contract Value per week' while Section 9.3H of Proposal Schedules specifies '0.5% of the portion of the Remuneration per week' — these are materially different calculation bases that must be reconciled before contract execution",
   "Section 9.2 payment table contains two separate Stage 4 entries both described as 'Upon formal approval of Enabling and Early Works, including Shell and Core Package' at 15% and 20% respectively — the distinction between these two identical milestone descriptions is unclear and creates payment ambiguity",
@@ -367,3 +422,7 @@ export const EDGNEX_FIDIC_DRAFTING_ERRORS: string[] = [
   'The document revision table in PART 1A (p.15) contains blank Author, Reviewer and Approved for Issue fields — the document has not been formally approved or version-controlled, raising questions about its contractual status',
   "Section 2.1.1 refers to 'Article 0 of the Agreement' for definitions but the Agreement (RFP Part 3) was not retrieved — key defined terms may differ between the Services Brief and the Agreement",
 ];
+
+export const EDGNEX_FIDIC_DRAFTING_ERROR_ITEMS: FidicCatalogItem[] = EDGNEX_FIDIC_DRAFTING_ERRORS.map((text, i) =>
+  parseColonItem(text, `draft-${i + 1}`),
+);

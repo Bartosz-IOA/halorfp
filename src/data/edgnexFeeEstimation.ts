@@ -1,16 +1,24 @@
+/** Portfolio roll-up from the fee model (both sites). */
+export const EDGNEX_FEE_PORTFOLIO_DESIGN_FEE = 'AED 286,627,000';
+
 export const EDGNEX_FEE_META = {
   title: 'Fee Estimation',
   projectLine: 'Dhahran & Dammam Tech Data Center',
   generatedLabel: 'Generated 13/05/2026',
 } as const;
 
-/** Short line under the fee report hero title (methodology, no named framework). */
-export const EDGNEX_FEE_INTRO =
-  'Three-step model in AED: CAPEX → design fee % → discipline split (details in key facts below).';
-
-/** Opening paragraph for the fee accordion: what this section contains and how the analysis is meant to be read. */
-export const EDGNEX_FEE_SECTION_OVERVIEW =
-  'This section turns the RFP scope into indicative design-fee levels for the two data centre assets. The fee analysis rolls up construction cost density into CAPEX, applies tier-based design-fee percentages, then splits results by discipline so you can compare asset-level and portfolio totals, sanity-check assumptions against the scoring narrative, and see where FX, GFA, or typology would move the numbers.';
+/** Structured opening under the fee report hero. */
+export const EDGNEX_FEE_SECTION_OVERVIEW = {
+  purpose:
+    'This section turns the RFP scope into indicative design-fee levels for the two data centre assets.',
+  steps: [
+    'Roll construction cost density into CAPEX per asset.',
+    'Apply tier-based design-fee percentages to each CAPEX band.',
+    'Split results by discipline for asset-level and portfolio comparison.',
+  ],
+  usage:
+    'Use the tables below to sanity-check assumptions against the scoring narrative and to see where FX, GFA, or typology would move the numbers.',
+} as const;
 
 export const EDGNEX_FEE_KEY_ROWS: {
   label: string;

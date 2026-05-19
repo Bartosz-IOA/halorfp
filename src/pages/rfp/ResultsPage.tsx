@@ -11,6 +11,8 @@ import {
 import type { GoNoGoRowData } from '../../types/rfpAssessment';
 import { EdgnexDataCentresResults } from './EdgnexDataCentresResults';
 import { EDGNEX_DEMO_ANALYSIS_ID, useEdgnexDemoStore } from '../../store/useEdgnexDemoStore';
+import { CommentAnchor } from '../../components/comments/CommentAnchor';
+import { CommentsModeBanner } from '../../components/comments/CommentsModeBanner';
 
 // --- MOCK DATA ---
 const MOCK_QUESTIONS = [
@@ -71,9 +73,10 @@ export const ResultsPage: React.FC = () => {
   return (
     <div className="min-h-full p-4 md:p-6 lg:p-8 font-sans bg-off-white">
       <div className="max-w-[1400px] mx-auto space-y-6">
+        <CommentsModeBanner />
 
         {/* --- Top Hero & Stats Block --- */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-6 items-start">
+        <CommentAnchor anchorId="results-summary" label="Executive summary" className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-6 items-start">
           
           {/* Executive Summary Left */}
           <div className="bg-white rounded-xl p-6 border border-border shadow-sm">
@@ -237,9 +240,10 @@ export const ResultsPage: React.FC = () => {
               alert
             />
           </div>
-        </div>
+        </CommentAnchor>
 
         {/* --- Source Documents --- */}
+        <CommentAnchor anchorId="results-sources" label="Source documents">
         <AccordionSection 
           title="SOURCE DOCUMENTS"
           summaryPill={<span className="text-[10px] text-text-secondary"><strong className="text-navy-primary">4</strong> RFP files · <strong className="text-navy-primary">1</strong> assessment output</span>}
@@ -276,9 +280,10 @@ export const ResultsPage: React.FC = () => {
             ))}
           </div>
         </AccordionSection>
+        </CommentAnchor>
 
         {/* --- Analysis Accordions --- */}
-        <div className="space-y-4 pb-12">
+        <CommentAnchor anchorId="results-scoring" label="Go / No-Go scoring" className="space-y-4 pb-12">
           
           <AccordionSection 
             number="01"
@@ -344,7 +349,7 @@ export const ResultsPage: React.FC = () => {
              <div className="py-8 text-center text-text-secondary text-sm">Fee analysis calculations go here...</div>
           </AccordionSection>
 
-        </div>
+        </CommentAnchor>
       </div>
 
       {/* --- Gallery Modal Overlay --- */}

@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { AlertTriangle, FileWarning, ShieldOff } from 'lucide-react';
 import {
   AccordionSection,
   AnalysisReportHero,
@@ -8,16 +9,19 @@ import {
   analysisTableShell,
   cn,
 } from '../../components/rfp/ResultPrimitives';
+import { useEdgnexSectionExpandBinding } from '../../contexts/EdgnexReportNavContext';
+import { CommentAnchor } from '../../components/comments/CommentAnchor';
+import { FidicExecutiveSummary } from '../../components/rfp/FidicExecutiveSummary';
 import {
   EDGNEX_FIDIC_CLAUSE_ROWS,
   EDGNEX_FIDIC_CONTRACT_DETAILS,
-  EDGNEX_FIDIC_DRAFTING_ERRORS,
-  EDGNEX_FIDIC_EXEC_SUMMARY,
+  EDGNEX_FIDIC_DRAFTING_ERROR_ITEMS,
   EDGNEX_FIDIC_INTRO,
   EDGNEX_FIDIC_META,
-  EDGNEX_FIDIC_MISSING_PROTECTIONS,
+  EDGNEX_FIDIC_MISSING_PROTECTION_ITEMS,
   EDGNEX_FIDIC_OVERALL_RATING,
   EDGNEX_FIDIC_TOP_RISKS,
+  type FidicCatalogItem,
   type FidicSeverity,
 } from '../../data/edgnexFidicContractAnalysis';
 
@@ -47,6 +51,120 @@ function severityPill(severity: FidicSeverity) {
     >
       {severity}
     </span>
+  );
+}
+
+function catalogCategoryPill(category: string, variant: 'missing' | 'drafting') {
+  const styles =
+    variant === 'missing'
+      ? 'bg-red-50 text-red-800 border-red-200/90'
+      : 'bg-amber-50 text-amber-900 border-amber-200/90';
+  return (
+    <span
+      className={cn(
+        'inline-flex items-center rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide',
+        styles,
+      )}
+    >
+      {category}
+    </span>
+  );
+}
+
+function IssueCatalogSummary({
+  count,
+  headline,
+  subline,
+  variant,
+}: {
+  count: number;
+  headline: string;
+  subline: string;
+  variant: 'missing' | 'drafting';
+}) {
+  const shell =
+    variant === 'missing'
+      ? 'border-red-200/80 bg-gradient-to-br from-red-50/90 to-red-50/30'
+      : 'border-amber-200/80 bg-gradient-to-br from-amber-50/90 to-amber-50/25';
+  const Icon = variant === 'missing' ? ShieldOff : FileWarning;
+  return (
+    <div className={cn('mb-5 flex gap-4 rounded-xl border p-4 sm:p-5', shell)}>
+      <div
+        className={cn(
+          'flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border shadow-sm',
+          variant === 'missing'
+            ? 'border-red-200/80 bg-white text-red-700'
+            : 'border-amber-200/80 bg-white text-amber-800',
+        )}
+        aria-hidden
+      >
+        <Icon size={22} strokeWidth={2} />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-text-secondary">{headline}</p>
+        <p className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+          <span className="text-2xl font-bold tabular-nums text-navy-primary">{count}</span>
+          <span className="text-sm font-semibold text-navy-primary">{subline}</span>
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function IssueCatalogCard({
+  item,
+  index,
+  variant,
+}: {
+  item: FidicCatalogItem;
+  index: number;
+  variant: 'missing' | 'drafting';
+}) {
+  const border =
+    variant === 'missing' ? 'border-l-red-500 hover:border-red-200/80' : 'border-l-amber-500 hover:border-amber-200/80';
+  const Icon = variant === 'missing' ? ShieldOff : AlertTriangle;
+  return (
+    <article
+      className={cn(
+        'rounded-xl border border-border/80 border-l-4 bg-white p-4 shadow-sm ring-1 ring-black/[0.02] transition-colors',
+        border,
+      )}
+    >
+      <div className="flex items-start gap-3">
+        <div
+          className={cn(
+            'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[11px] font-bold tabular-nums',
+            variant === 'missing' ? 'bg-red-50 text-red-800' : 'bg-amber-50 text-amber-900',
+          )}
+          aria-hidden
+        >
+          {index + 1}
+        </div>
+        <div className="min-w-0 flex-1 space-y-2">
+          <div className="flex flex-wrap items-start justify-between gap-2">
+            <h4 className="text-sm font-bold leading-snug text-navy-primary pr-1">{item.title}</h4>
+            {catalogCategoryPill(item.category, variant)}
+          </div>
+          {item.detail ? (
+            <p className="text-xs leading-relaxed text-text-secondary">{item.detail}</p>
+          ) : null}
+          <div className="flex items-center gap-1.5 pt-0.5 text-[10px] font-medium text-text-secondary/90">
+            <Icon size={12} className="shrink-0 opacity-70" aria-hidden />
+            <span>{variant === 'missing' ? 'Standard FIDIC-style protection absent' : 'Review before pricing or submission'}</span>
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function IssueCatalogGrid({ items, variant }: { items: FidicCatalogItem[]; variant: 'missing' | 'drafting' }) {
+  return (
+    <div className="grid gap-3 sm:grid-cols-2">
+      {items.map((item, index) => (
+        <IssueCatalogCard key={item.id} item={item} index={index} variant={variant} />
+      ))}
+    </div>
   );
 }
 
@@ -95,6 +213,7 @@ function FidicSeverityFilter({
 }
 
 export const FidicContractAnalysisSection: React.FC = () => {
+  const bindFidicExpand = useEdgnexSectionExpandBinding('edgnex-fidic');
   const [topRisksSeverity, setTopRisksSeverity] = useState<SeverityFilter>('ALL');
   const [clausesSeverity, setClausesSeverity] = useState<SeverityFilter>('ALL');
   const [clausePaneTall, setClausePaneTall] = useState(false);
@@ -116,6 +235,7 @@ export const FidicContractAnalysisSection: React.FC = () => {
   );
 
   return (
+    <CommentAnchor anchorId="edgnex-fidic" label="Contract analysis (FIDIC)" scopeOnly>
     <AccordionSection
       sectionId="edgnex-fidic"
       number="02"
@@ -126,6 +246,7 @@ export const FidicContractAnalysisSection: React.FC = () => {
         </span>
       }
       defaultExpanded={false}
+      onRegisterExpand={bindFidicExpand}
     >
       <div className="space-y-6 sm:space-y-8">
         <AnalysisReportHero
@@ -159,15 +280,19 @@ export const FidicContractAnalysisSection: React.FC = () => {
           </p>
 
           <CollapsibleSubsection
+            commentPrefix="edgnex-fidic"
+            commentSectionLabel="Contract"
             anchorId="fidic-ss-exec"
             title="Executive summary"
             defaultOpen
             summary="Overall risk narrative and negotiation prerequisites."
           >
-            <p className="text-sm leading-relaxed whitespace-pre-wrap">{EDGNEX_FIDIC_EXEC_SUMMARY}</p>
+            <FidicExecutiveSummary />
           </CollapsibleSubsection>
 
           <CollapsibleSubsection
+            commentPrefix="edgnex-fidic"
+            commentSectionLabel="Contract"
             anchorId="fidic-ss-rating"
             title="Overall risk rating & contract details"
             summary={`Rating: ${EDGNEX_FIDIC_OVERALL_RATING} · Client, project, law, and commercial metadata.`}
@@ -179,20 +304,22 @@ export const FidicContractAnalysisSection: React.FC = () => {
             <h5 className="text-[10px] font-bold text-text-secondary uppercase tracking-widest mb-3">
               Contract details
             </h5>
-            <dl className="space-y-2">
+            <dl className="divide-y divide-border/70 text-xs">
               {EDGNEX_FIDIC_CONTRACT_DETAILS.map((row) => (
                 <div
                   key={row.label}
-                  className="rounded-xl border border-border/60 bg-off-white/40 px-4 py-3 grid grid-cols-1 md:grid-cols-[140px_1fr] gap-1 md:gap-4 text-xs"
+                  className="grid grid-cols-1 gap-1 py-3.5 md:grid-cols-[140px_1fr] md:gap-4 md:items-start"
                 >
                   <dt className="font-bold text-text-secondary shrink-0">{row.label}</dt>
-                  <dd className="text-navy-primary leading-relaxed">{row.value}</dd>
+                  <dd className="m-0 text-navy-primary leading-relaxed">{row.value}</dd>
                 </div>
               ))}
             </dl>
           </CollapsibleSubsection>
 
           <CollapsibleSubsection
+            commentPrefix="edgnex-fidic"
+            commentSectionLabel="Contract"
             anchorId="fidic-ss-risks"
             title="Top 10 risk items"
             summary="Ranked exposures with clause references, severity, and DSA position."
@@ -272,6 +399,8 @@ export const FidicContractAnalysisSection: React.FC = () => {
           </CollapsibleSubsection>
 
           <CollapsibleSubsection
+            commentPrefix="edgnex-fidic"
+            commentSectionLabel="Contract"
             anchorId="fidic-ss-clauses"
             title="Clause-by-clause analysis"
             summary="Twelve clauses vs FIDIC White Book 2017 — expand each clause for full text, amendment, and rationale."
@@ -310,6 +439,8 @@ export const FidicContractAnalysisSection: React.FC = () => {
                 >
                   {filteredClauseRows.map((row) => (
                     <CollapsibleSubsection
+                      commentPrefix="edgnex-fidic"
+                      commentSectionLabel="Contract"
                       key={row.clauseRef}
                       nested
                       title={row.topic}
@@ -362,36 +493,47 @@ export const FidicContractAnalysisSection: React.FC = () => {
           </CollapsibleSubsection>
 
           <CollapsibleSubsection
+            commentPrefix="edgnex-fidic"
+            commentSectionLabel="Contract"
             anchorId="fidic-ss-missing"
             title="Missing protections"
-            summary="Standard FIDIC-style protections absent from the retrieved RFP set."
+            summary={`${EDGNEX_FIDIC_MISSING_PROTECTION_ITEMS.length} standard protections not found in the retrieved RFP set`}
           >
-            <ul className="space-y-2.5 text-xs text-navy-primary leading-relaxed">
-              {EDGNEX_FIDIC_MISSING_PROTECTIONS.map((item, i) => (
-                <li key={`missing-${i}`} className="flex gap-2">
-                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-navy-mid/40" aria-hidden />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
+            <p className="mb-4 text-xs leading-relaxed text-text-secondary max-w-[85ch]">
+              Each item is a FIDIC White Book–style protection that was not located in the issued pack. Absence
+              increases uncapped or unqualified exposure and should be treated as a pre-bid negotiation point.
+            </p>
+            <IssueCatalogSummary
+              count={EDGNEX_FIDIC_MISSING_PROTECTION_ITEMS.length}
+              headline="Missing protections"
+              subline="items not found in retrieved documents"
+              variant="missing"
+            />
+            <IssueCatalogGrid items={EDGNEX_FIDIC_MISSING_PROTECTION_ITEMS} variant="missing" />
           </CollapsibleSubsection>
 
           <CollapsibleSubsection
+            commentPrefix="edgnex-fidic"
+            commentSectionLabel="Contract"
             anchorId="fidic-ss-drafting"
             title="Drafting errors & inconsistencies"
-            summary="Cross-references, TBCs, and document control gaps."
+            summary={`${EDGNEX_FIDIC_DRAFTING_ERROR_ITEMS.length} cross-reference, scope, and commercial ambiguities`}
           >
-            <ul className="space-y-2.5 text-xs text-navy-primary leading-relaxed">
-              {EDGNEX_FIDIC_DRAFTING_ERRORS.map((item, i) => (
-                <li key={`draft-${i}`} className="flex gap-2">
-                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500/70" aria-hidden />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
+            <p className="mb-4 text-xs leading-relaxed text-text-secondary max-w-[85ch]">
+              Internal contradictions, dangling references, and unresolved placeholders that affect scope certainty,
+              insurance, liquidated damages, and payment milestones. Resolve or qualify before final pricing.
+            </p>
+            <IssueCatalogSummary
+              count={EDGNEX_FIDIC_DRAFTING_ERROR_ITEMS.length}
+              headline="Drafting & consistency"
+              subline="issues requiring clarification"
+              variant="drafting"
+            />
+            <IssueCatalogGrid items={EDGNEX_FIDIC_DRAFTING_ERROR_ITEMS} variant="drafting" />
           </CollapsibleSubsection>
         </div>
       </div>
     </AccordionSection>
+    </CommentAnchor>
   );
 };

@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import type { GoNoGoRowData } from '../../types/rfpAssessment';
+import { CommentAnchor } from '../comments/CommentAnchor';
+import { buildCommentAnchorId, buildCommentLabel } from '../../lib/commentAnchorId';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -31,7 +33,7 @@ export const IndicatorCard = ({
 }) => (
   <div
     className={cn(
-      'flex flex-col p-4 sm:p-5 rounded-2xl border min-h-[108px] justify-center transition-shadow duration-200',
+      'flex w-full min-w-0 max-w-full flex-col overflow-hidden p-4 sm:p-5 rounded-2xl border min-h-[108px] justify-center transition-shadow duration-200',
       alert
         ? 'bg-gradient-to-br from-red-50 to-red-50/40 border-red-200/90 shadow-sm'
         : 'bg-white border-border/90 shadow-card hover:shadow-md ring-1 ring-black/[0.03]',
@@ -39,7 +41,7 @@ export const IndicatorCard = ({
   >
     <p
       className={cn(
-        'text-[10px] font-bold uppercase tracking-widest mb-1.5',
+        'mb-1.5 text-[10px] font-bold uppercase leading-snug tracking-wide',
         alert ? 'text-red-800/90' : 'text-text-secondary',
       )}
     >
@@ -47,14 +49,14 @@ export const IndicatorCard = ({
     </p>
     <div
       className={cn(
-        'text-2xl sm:text-[1.65rem] font-bold mb-1 tabular-nums tracking-tight',
+        'mb-1 min-w-0 max-w-full text-[clamp(1.125rem,2.8vw,1.5rem)] font-bold leading-tight tabular-nums',
         alert ? 'text-red-600' : 'text-navy-primary',
       )}
     >
       {value}
     </div>
     {subtext && (
-      <div className={cn('text-xs leading-snug', alert ? 'text-red-700/85' : 'text-text-secondary')}>
+      <div className={cn('text-xs leading-snug break-words', alert ? 'text-red-700/85' : 'text-text-secondary')}>
         {subtext}
       </div>
     )}
@@ -74,7 +76,19 @@ export type ReferenceInfoListRow = {
 /**
  * Vertical “key facts” list: label | value | info icon. Hover/focus shows tooltip; tap/click the icon pins it open until dismissed or click outside.
  */
-export const ReferenceInfoList = ({ rows }: { rows: ReferenceInfoListRow[] }) => {
+export const ReferenceInfoList = ({
+  rows,
+  commentPrefix,
+  commentSectionLabel,
+  dense = false,
+}: {
+  rows: ReferenceInfoListRow[];
+  /** When set, each row becomes its own comment target. */
+  commentPrefix?: string;
+  commentSectionLabel?: string;
+  /** Tighter row padding for long lists (e.g. overview executive summary / key facts). */
+  dense?: boolean;
+}) => {
   const [pinnedRow, setPinnedRow] = useState<number | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -100,15 +114,29 @@ export const ReferenceInfoList = ({ rows }: { rows: ReferenceInfoListRow[] }) =>
           Boolean(row.referenceSource?.trim());
         const isPinned = pinnedRow === idx;
 
-        return (
+        const rowInner = (
           <div
-            key={`${idx}-${row.label}`}
-            className="relative flex items-start gap-3 border-b border-border/70 px-4 py-3.5 last:border-b-0 sm:gap-4 sm:px-5 sm:py-4"
+            className={cn(
+              'relative flex items-start border-b border-border/70 px-3 last:border-b-0 sm:px-4',
+              dense ? 'gap-2 py-1.5 sm:gap-2.5 sm:py-2' : 'gap-2.5 py-3.5 sm:gap-3 sm:py-4',
+            )}
           >
-            <div className="w-[132px] shrink-0 pt-0.5 text-[11px] font-bold uppercase leading-snug tracking-wide text-text-secondary sm:w-[172px]">
+            <div
+              className={cn(
+                'shrink-0 pt-0.5 text-[11px] font-bold uppercase leading-snug tracking-wide text-text-secondary',
+                dense ? 'w-[120px] sm:w-[156px]' : 'w-[132px] sm:w-[172px]',
+              )}
+            >
               {row.label}
             </div>
-            <div className="min-w-0 flex-1 text-xs leading-relaxed text-navy-primary sm:text-sm">{row.value}</div>
+            <div
+              className={cn(
+                'min-w-0 flex-1 break-words text-navy-primary',
+                dense ? 'text-xs leading-snug sm:text-[13px]' : 'text-xs leading-relaxed sm:text-sm',
+              )}
+            >
+              {row.value}
+            </div>
             {hasRef ? (
               <div className="group/kftip relative shrink-0">
                 <button
@@ -168,6 +196,21 @@ export const ReferenceInfoList = ({ rows }: { rows: ReferenceInfoListRow[] }) =>
             )}
           </div>
         );
+
+        if (commentPrefix && commentSectionLabel) {
+          return (
+            <CommentAnchor
+              key={`${idx}-${row.label}`}
+              anchorId={buildCommentAnchorId(commentPrefix, row.label)}
+              label={buildCommentLabel(commentSectionLabel, row.label)}
+              variant="inline"
+            >
+              {rowInner}
+            </CommentAnchor>
+          );
+        }
+
+        return <React.Fragment key={`${idx}-${row.label}`}>{rowInner}</React.Fragment>;
       })}
     </div>
   );
@@ -227,6 +270,7 @@ export const AnalysisReportHero = ({
   generatedLabel,
   benchmarkLine,
   intro,
+  introContent,
   leadWord,
   footer,
 }: {
@@ -235,7 +279,10 @@ export const AnalysisReportHero = ({
   subtitle?: string;
   generatedLabel: string;
   benchmarkLine?: string;
-  intro: string;
+  /** Plain-text intro (ignored when introContent is set). */
+  intro?: string;
+  /** Structured intro block (preferred for long narratives). */
+  introContent?: React.ReactNode;
   /** Optional short lead-in (e.g. section label). Omit for a direct narrative opening. */
   leadWord?: string;
   footer?: React.ReactNode;
@@ -260,18 +307,22 @@ export const AnalysisReportHero = ({
         </span>
       )}
     </div>
-    <div className="mt-5 border-t border-border/70 pt-5">
-      <p className="text-sm text-text-primary leading-relaxed max-w-prose">
-        {leadWord ? (
-          <>
-            <span className="font-semibold text-navy-primary">{leadWord}</span>
-            <br />
-            <br />
-          </>
-        ) : null}
-        {intro}
-      </p>
-    </div>
+    {(introContent || intro) && (
+      <div className="mt-5 border-t border-border/70 pt-5">
+        {introContent ?? (
+          <p className="text-sm text-text-primary leading-relaxed max-w-prose">
+            {leadWord ? (
+              <>
+                <span className="font-semibold text-navy-primary">{leadWord}</span>
+                <br />
+                <br />
+              </>
+            ) : null}
+            {intro}
+          </p>
+        )}
+      </div>
+    )}
     {footer && <div className="mt-5 border-t border-border/70 pt-5">{footer}</div>}
   </header>
 );
@@ -282,6 +333,7 @@ export const AccordionSection = ({
   summaryPill,
   defaultExpanded = false,
   sectionId,
+  onRegisterExpand,
   children,
 }: {
   title: string;
@@ -290,12 +342,19 @@ export const AccordionSection = ({
   defaultExpanded?: boolean;
   /** Anchor id for in-page navigation (scroll-margin applied) */
   sectionId?: string;
+  /** When provided, parent can open this accordion (e.g. in-page jump nav). */
+  onRegisterExpand?: (expand: () => void) => void | (() => void);
   children?: React.ReactNode;
 }) => {
   const [expanded, setExpanded] = useState(defaultExpanded);
   const baseId = useId();
   const regionId = `${baseId}-region`;
   const panelFocusRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!onRegisterExpand) return;
+    return onRegisterExpand(() => setExpanded(true));
+  }, [onRegisterExpand]);
 
   useEffect(() => {
     if (!expanded) return;
@@ -383,6 +442,8 @@ export const CollapsibleSubsection = ({
   children,
   anchorId,
   className,
+  commentPrefix,
+  commentSectionLabel,
 }: {
   title: string;
   summary?: string;
@@ -392,6 +453,8 @@ export const CollapsibleSubsection = ({
   children: React.ReactNode;
   anchorId?: string;
   className?: string;
+  commentPrefix?: string;
+  commentSectionLabel?: string;
 }) => {
   const [open, setOpen] = useState(defaultOpen);
   const regionId = useId();
@@ -469,7 +532,17 @@ export const CollapsibleSubsection = ({
                   : 'px-4 pb-4 pl-11 pr-4 pt-3.5 text-sm',
               )}
             >
-              {children}
+              {commentPrefix && commentSectionLabel ? (
+                <CommentAnchor
+                  anchorId={buildCommentAnchorId(commentPrefix, title)}
+                  label={buildCommentLabel(commentSectionLabel, title)}
+                  variant="block"
+                >
+                  {children}
+                </CommentAnchor>
+              ) : (
+                children
+              )}
             </div>
           </motion.div>
         )}
@@ -481,55 +554,130 @@ export const CollapsibleSubsection = ({
 function answerToneClass(answer: string) {
   const a = answer.trim();
   if (/^yes$/i.test(a) || /^option a/i.test(a)) return 'text-green-700';
+  if (/not connected/i.test(a)) return 'text-sky-700';
   if (/^no$/i.test(a) || /^not scored/i.test(a) || /^unknown/i.test(a)) return 'text-amber-700';
   if (/blocker|penalty|option b.*bond/i.test(a)) return 'text-red-600';
   return 'text-navy-primary';
 }
 
-export const GoNoGoRow = ({ data }: { data: GoNoGoRowData }) => {
+function resolveGoNoGoInputState(data: GoNoGoRowData) {
+  if (data.inputState) return data.inputState;
+  return 'scored';
+}
+
+/** Full-width faint track behind the scored fill (submission-timeline style). */
+function goNoGoFaintTrackClass(data: GoNoGoRowData, isScoredZero: boolean) {
+  if (data.isBlocker || isScoredZero) return 'bg-red-100/90';
+  if (data.color.includes('green')) return 'bg-green-100/85';
+  if (data.color.includes('amber')) return 'bg-amber-100/85';
+  if (data.color.includes('red')) return 'bg-red-100/90';
+  return 'bg-slate-100/90';
+}
+
+export const GoNoGoRow = ({
+  data,
+  commentScope,
+  commentSectionLabel = 'Scoring',
+}: {
+  data: GoNoGoRowData;
+  commentScope?: string;
+  commentSectionLabel?: string;
+}) => {
   const [open, setOpen] = useState(false);
+  const inputState = resolveGoNoGoInputState(data);
+  const isDisconnected = inputState === 'disconnected';
+  const isUnselected = inputState === 'unselected';
+  const isScoredZero = inputState === 'scored' && !data.isBlocker && data.score === 0;
 
   const widthPercent =
     data.score > 0 ? (data.score / data.max) * 100 : data.score === 0 ? 0 : 100;
 
-  return (
-    <div className="mb-2">
+  const scoreLabel = data.isBlocker
+    ? '-100 penalty'
+    : isDisconnected
+      ? 'Not connected'
+      : isUnselected
+        ? `— / ${data.max}`
+        : `${data.score} / ${data.max}`;
+
+  const row = (
+    <div className="mb-2 min-w-0">
       <button
         type="button"
         className={cn(
-          'w-full text-left rounded-xl border border-transparent transition-colors',
-          'grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1.1fr)_minmax(0,2fr)_minmax(88px,100px)_28px] sm:gap-3 sm:items-center p-3 sm:p-2.5',
-          open ? 'bg-surface-grey border-border/60 shadow-sm' : 'hover:bg-surface-grey/70 hover:border-border/40',
+          'w-full min-w-0 text-left rounded-xl border transition-colors',
+          'grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)_minmax(96px,112px)_24px] sm:gap-x-3 sm:items-center p-3 sm:p-2.5',
+          isDisconnected && 'border-dashed border-sky-200/90 bg-sky-50/30',
+          isUnselected && 'border-dashed border-amber-200/80 bg-amber-50/20',
+          !isDisconnected &&
+            !isUnselected &&
+            (open
+              ? 'bg-surface-grey border-border/60 shadow-sm'
+              : 'border-transparent hover:bg-surface-grey/70 hover:border-border/40'),
         )}
         onClick={() => setOpen(!open)}
         aria-expanded={open}
       >
-        <div className="text-xs text-navy-primary font-semibold sm:truncate pr-1 leading-snug">{data.name}</div>
+        <div className="text-sm text-navy-primary font-semibold sm:truncate pr-1 leading-snug">{data.name}</div>
 
-        <div className="relative h-2 sm:h-1.5 bg-border/80 rounded-full overflow-hidden order-3 sm:order-none">
+        <div
+          className={cn(
+            'relative h-2 sm:h-1.5 rounded-full overflow-hidden order-3 sm:order-none min-w-0',
+            isDisconnected && 'border border-dashed border-sky-300/70 bg-sky-50/50',
+            isUnselected && 'border border-dashed border-amber-300/60 bg-amber-50/30',
+          )}
+        >
           {data.isBlocker ? (
-            <div className="absolute left-0 top-0 bottom-0 w-full bg-red-600 rounded-full" />
-          ) : (
-            <div
-              className={cn(
-                'absolute left-0 top-0 bottom-0 rounded-full transition-all duration-500',
-                data.color,
-              )}
-              style={{ width: `${widthPercent}%` }}
-            />
+            <>
+              <div className="absolute inset-0 rounded-full bg-red-100/90" aria-hidden />
+              <div className="absolute left-0 top-0 bottom-0 w-full rounded-full bg-red-600" />
+            </>
+          ) : isDisconnected || isUnselected ? null : (
+            <>
+              <div
+                className={cn('absolute inset-0 rounded-full', goNoGoFaintTrackClass(data, isScoredZero))}
+                aria-hidden
+              />
+              {widthPercent > 0 ? (
+                <div
+                  className={cn(
+                    'absolute left-0 top-0 bottom-0 rounded-full transition-all duration-500',
+                    data.color,
+                  )}
+                  style={{ width: `${widthPercent}%` }}
+                />
+              ) : null}
+            </>
           )}
         </div>
 
-        <div className="flex sm:block justify-between sm:text-right items-center gap-2 order-2 sm:order-none">
+        <div className="flex sm:flex-col sm:items-end justify-between sm:text-right items-center gap-2 order-2 sm:order-none min-w-0">
           <div
             className={cn(
-              'text-xs font-bold tabular-nums',
-              data.isBlocker ? 'text-red-600' : data.score === 0 ? 'text-slate-500' : 'text-green-700',
+              'shrink-0 text-xs font-bold tabular-nums',
+              data.isBlocker && 'text-red-600',
+              isDisconnected && 'text-sky-700',
+              isUnselected && 'text-amber-800/90',
+              isScoredZero && 'text-red-600',
+              !data.isBlocker &&
+                !isDisconnected &&
+                !isUnselected &&
+                !isScoredZero &&
+                data.score > 0 &&
+                'text-green-700',
             )}
           >
-            {data.isBlocker ? '-100 penalty' : `${data.score} / ${data.max}`}
+            {scoreLabel}
           </div>
-          <div className="text-[10px] text-text-secondary sm:truncate max-w-[200px] sm:max-w-none sm:ml-auto">
+          <div
+            className={cn(
+              'min-w-0 text-[10px] leading-snug sm:ml-auto break-words',
+              isDisconnected && 'font-medium text-sky-800/90',
+              isUnselected && 'italic text-amber-900/75',
+              isScoredZero && 'text-red-800/85',
+              !isDisconnected && !isUnselected && !isScoredZero && 'text-text-secondary',
+            )}
+          >
             {data.text}
           </div>
         </div>
@@ -606,5 +754,17 @@ export const GoNoGoRow = ({ data }: { data: GoNoGoRowData }) => {
         )}
       </AnimatePresence>
     </div>
+  );
+
+  if (!commentScope) return row;
+
+  return (
+    <CommentAnchor
+      anchorId={buildCommentAnchorId(commentScope, data.id)}
+      label={buildCommentLabel(commentSectionLabel, data.name)}
+      variant="inline"
+    >
+      {row}
+    </CommentAnchor>
   );
 };
