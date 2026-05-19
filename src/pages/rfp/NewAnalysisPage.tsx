@@ -12,6 +12,7 @@ import {
   ChevronLeft
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { EDGNEX_DEMO_ANALYSIS_ID, useEdgnexDemoStore } from '../../store/useEdgnexDemoStore';
 
 interface FileState {
   file: File;
@@ -26,6 +27,7 @@ export const NewAnalysisPage: React.FC = () => {
   const [comment, setComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  const beginDemoFromNewAnalysis = useEdgnexDemoStore((s) => s.beginDemoFromNewAnalysis);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const newFiles: FileState[] = acceptedFiles.map(file => ({
@@ -66,7 +68,9 @@ export const NewAnalysisPage: React.FC = () => {
     accept: {
       'application/pdf': ['.pdf'],
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx']
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
+      'application/zip': ['.zip'],
+      'application/x-zip-compressed': ['.zip'],
     },
     maxSize: 50 * 1024 * 1024 // 50MB
   });
@@ -78,7 +82,8 @@ export const NewAnalysisPage: React.FC = () => {
     setIsSubmitting(true);
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1500));
-    navigate('/rfp/new-id/processing');
+    beginDemoFromNewAnalysis();
+    navigate(`/rfp/${EDGNEX_DEMO_ANALYSIS_ID}/processing`);
   };
 
   const allUploaded = files.length > 0 && files.every(f => f.status === 'SUCCESS');
@@ -118,7 +123,7 @@ export const NewAnalysisPage: React.FC = () => {
                 Drag files here or click to browse
               </p>
               <p className="text-sm text-text-secondary">
-                PDF, DOCX, XLSX — max 50MB per file
+                PDF, DOCX, XLSX, ZIP — max 50MB per file
               </p>
             </div>
           </div>

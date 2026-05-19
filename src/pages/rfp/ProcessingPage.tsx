@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Loader2, FileText, CheckCircle2 } from 'lucide-react';
+import { EDGNEX_DEMO_ANALYSIS_ID, useEdgnexDemoStore } from '../../store/useEdgnexDemoStore';
 
 const STEPS = [
   "Reading documents...",
@@ -16,22 +17,39 @@ export const ProcessingPage: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const { id } = useParams();
   const navigate = useNavigate();
+  const isProcessingFromNewFlow = useEdgnexDemoStore((s) => s.isProcessingFromNewFlow);
+  const isEdgnexVisible = useEdgnexDemoStore((s) => s.isVisible);
+  const completeDemoProcessing = useEdgnexDemoStore((s) => s.completeDemoProcessing);
 
   useEffect(() => {
+    if (id !== EDGNEX_DEMO_ANALYSIS_ID || isProcessingFromNewFlow) return;
+    if (isEdgnexVisible) {
+      navigate(`/rfp/${EDGNEX_DEMO_ANALYSIS_ID}`, { replace: true });
+    } else {
+      navigate('/rfp', { replace: true });
+    }
+  }, [id, isProcessingFromNewFlow, isEdgnexVisible, navigate]);
+
+  useEffect(() => {
+    if (!id) return;
+    if (id === EDGNEX_DEMO_ANALYSIS_ID && !isProcessingFromNewFlow) return;
+
     const stepInterval = setInterval(() => {
       setCurrentStep(prev => (prev < STEPS.length - 1 ? prev + 1 : prev));
     }, 2500);
 
-    // Simulate completion after 12 seconds
     const completionTimer = setTimeout(() => {
-      navigate(`/rfp/${id}`);
+      if (id === EDGNEX_DEMO_ANALYSIS_ID) {
+        completeDemoProcessing();
+      }
+      navigate(`/rfp/${id}`, { replace: true });
     }, 12000);
 
     return () => {
       clearInterval(stepInterval);
       clearTimeout(completionTimer);
     };
-  }, [id, navigate]);
+  }, [id, navigate, isProcessingFromNewFlow, completeDemoProcessing]);
 
   return (
     <div className="h-[calc(100vh-theme(height.topbar))] flex items-center justify-center p-8 bg-off-white">

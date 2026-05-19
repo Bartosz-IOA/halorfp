@@ -2,6 +2,7 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 import type { User } from '@supabase/supabase-js';
+import { useEdgnexDemoStore } from './useEdgnexDemoStore';
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -53,6 +54,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       throw error;
     }
 
+    useEdgnexDemoStore.getState().reset();
     set({
       isAuthenticated: true,
       user: data.user,
@@ -61,6 +63,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   logout: async () => {
     await supabase.auth.signOut();
+    useEdgnexDemoStore.getState().reset();
     set({
       isAuthenticated: false,
       user: null,
