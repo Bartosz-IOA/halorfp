@@ -11,41 +11,10 @@ export const EDGNEX_FIDIC_INTRO =
 export const EDGNEX_FIDIC_EXEC_SUMMARY = `This RFP document set for the EDGNEX/DAMAC Dhahran and Dammam Data Center Lead Consultancy presents a contract risk profile that DSA Architects must rate as Critical before proceeding to bid.`;
 
 export const EDGNEX_FIDIC_EXEC_SUMMARY_CONTENT = {
-  lead: 'This RFP document set for the EDGNEX/DAMAC Dhahran and Dammam Data Center Lead Consultancy presents a contract risk profile that DSA Architects must rate as Critical before proceeding to bid.',
-  topExposures: [
-    {
-      title: 'No limitation of liability cap',
-      detail:
-        'Complete absence of a cap across all retrieved documents, leaving DSA with unlimited exposure on a 50–200 MW hyperscale facility.',
-    },
-    {
-      title: 'Third-party AOR assumption (Section 2.1.7.1(d))',
-      detail:
-        'DSA must assume AOR liability for all third-party designs without a paid review period or Employer indemnity — likely uninsurable under standard PI terms.',
-    },
-    {
-      title: 'Uncapped delay penalties (Section 9.3H)',
-      detail:
-        "Penalties deducted 'notwithstanding any objections', combined with Employer discretion to deduct for design deficiencies with no process or cap.",
-    },
-    {
-      title: 'No dispute resolution clause',
-      detail:
-        'No contractual mechanism to challenge deductions, recover withheld payments, or resolve disagreements short of litigation.',
-    },
-  ],
-  compounding: [
-    'Material LD basis inconsistency between the Commercial T&Cs and Section 9.3H.',
-    'Open-ended scope against a fixed lump sum.',
-    "Unconditional surrender of DSA's proposal IP to DAMAC.",
-  ],
-  negotiationIntro: 'DSA should not submit a proposal unless DAMAC agrees in pre-bid negotiations to:',
-  negotiationItems: [
-    'Insert a limitation of liability cap.',
-    'Remove the third-party AOR liability assumption (or qualify with review period and indemnity).',
-    'Cap and qualify the delay penalty regime.',
-    'Insert a dispute resolution clause.',
-    'Clarify the LD calculation basis in writing.',
+  paragraphs: [
+    'This RFP document set for the EDGNEX/DAMAC Dhahran and Dammam Data Center Lead Consultancy presents a contract risk profile that DSA Architects must rate as Critical before proceeding to bid.',
+    'The dominant exposures are structural: there is no limitation-of-liability cap across the retrieved documents, leaving unlimited exposure on a 50–200 MW hyperscale facility; Section 2.1.7.1(d) requires DSA to assume AOR liability for third-party designs without a paid review period or Employer indemnity; Section 9.3H permits uncapped delay penalties to be deducted notwithstanding objection, with broad Employer discretion over design-related deductions; and no dispute-resolution clause provides a route to challenge withholdings short of litigation. These items are worsened by inconsistent liquidated-damages bases between the Commercial T&Cs and Section 9.3H, open-ended scope against a fixed lump sum, and unconditional surrender of DSA proposal IP to DAMAC.',
+    'On that basis, DSA should treat submission as conditional on pre-bid agreement to a liability cap, removal or qualification of the third-party AOR assumption, a capped and procedurally fair delay-penalty regime, an agreed dispute-resolution mechanism, and written confirmation of the LD calculation basis.',
   ],
 } as const;
 

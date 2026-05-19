@@ -1,3 +1,6 @@
+/** Portfolio roll-up from the fee model (both sites). */
+export const EDGNEX_FEE_PORTFOLIO_DESIGN_FEE = 'AED 286,627,000';
+
 export const EDGNEX_FEE_META = {
   title: 'Fee Estimation',
   projectLine: 'Dhahran & Dammam Tech Data Center',

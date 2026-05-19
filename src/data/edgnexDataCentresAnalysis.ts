@@ -1,6 +1,9 @@
 import type { ExecSummaryBlock, GoNoGoRowData } from '../types/rfpAssessment';
+import { EDGNEX_FEE_PORTFOLIO_DESIGN_FEE } from './edgnexFeeEstimation';
 
 export const EDGNEX_GENERATED_LABEL = 'Generated 23/06/2024';
+
+export const EDGNEX_CLIENT_NAME = 'Damac Properties Co. LLC';
 
 export const EDGNEX_EXEC_SUMMARY: ExecSummaryBlock[] = [
   {
@@ -36,6 +39,16 @@ export const EDGNEX_EXEC_SUMMARY: ExecSummaryBlock[] = [
       summary: 'Programme & bid timing',
       detail:
         'Staged design programme and construction duration are defined in the Services Brief; the email thread records correspondence on how little time may be available to submit after issuance.',
+    },
+  },
+  {
+    heading: 'Design fee (indicative)',
+    body: `Portfolio-level design fee is estimated at ${EDGNEX_FEE_PORTFOLIO_DESIGN_FEE} across 100,000 m² combined GFA (50,000 m² per site), using tier-based CAPEX bands at 5.5% with discipline splits per the fee model.`,
+    reference: {
+      citations: 'Fee_Generator_Rev00.xlsx — Master Con Cost; Fee model portfolio roll-up',
+      summary: 'Fee estimation model',
+      detail:
+        'Construction cost density from Fee_Generator master costs (USD), converted at 3.67 AED/USD; design fee percentage follows CAPEX tier bands; portfolio total matches Dhahran and Dammam asset roll-up.',
     },
   },
   {
@@ -91,6 +104,12 @@ export const EDGNEX_KEY_FACTS: { label: string; value: string; note: string; ref
     value: '3 months design · 14 months construction',
     note: 'Stage 1 optional; Stages 2–4 and 4T required.',
     ref: 'Services Brief Summary.pdf, p.3–4, 14',
+  },
+  {
+    label: 'Design fee (indicative)',
+    value: EDGNEX_FEE_PORTFOLIO_DESIGN_FEE,
+    note: 'Portfolio total across 100,000 m² GFA (50,000 m² per site); tier-based CAPEX at 5.5% per fee model.',
+    ref: 'Fee_Generator_Rev00.xlsx — Fee model portfolio roll-up',
   },
   {
     label: 'Decision rationale',

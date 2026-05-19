@@ -145,7 +145,7 @@ export const LandingPage: React.FC = () => {
         <img src="/halo-wordmark.svg" alt="HALO" className="h-5 md:h-6 w-auto" />
         <NavLink
           to="/login"
-          className="text-white/55 text-[10px] md:text-[11px] font-bold tracking-widest uppercase hover:text-yellow transition-colors"
+          className="text-white/75 text-[10px] md:text-[11px] font-bold tracking-widest uppercase hover:text-yellow transition-colors"
         >
           Log In
         </NavLink>
@@ -156,7 +156,7 @@ export const LandingPage: React.FC = () => {
         <div className="flex flex-col-reverse md:grid md:grid-cols-[1.1fr_0.9fr] gap-12 md:gap-16 items-center">
           {/* LEFT: Copy */}
           <div>
-            <p className="text-white/45 text-[10px] md:text-[11px] tracking-wide mb-4">
+            <p className="text-white/70 text-[10px] md:text-[11px] tracking-wide mb-4">
               Pre-Contract Intelligence for Enterprise Bidding
             </p>
 
@@ -175,7 +175,7 @@ export const LandingPage: React.FC = () => {
             </h1>
 
             {/* Sub-copy */}
-            <p className="text-white/50 text-sm md:text-base leading-relaxed max-w-[460px] mb-8">
+            <p className="text-white/80 text-sm md:text-base leading-relaxed max-w-[460px] mb-8">
               AI agents governing your entire pre-contract process —
               from first opportunity to contract signature. Structured,
               auditable, defensible at every stage.
@@ -184,7 +184,7 @@ export const LandingPage: React.FC = () => {
             {/* Tool tags */}
             <div className="flex flex-wrap gap-2 mb-8 md:mb-10">
               {TOOL_TAGS.map(t => (
-                <span key={t} className="border border-white/20 text-white/45 text-[8px] md:text-[9px] font-bold tracking-widest px-3 py-1.5 md:px-3.5 md:py-1.5 rounded uppercase">
+                <span key={t} className="border border-white/35 text-white/65 text-[8px] md:text-[9px] font-bold tracking-widest px-3 py-1.5 md:px-3.5 md:py-1.5 rounded uppercase">
                   {t}
                 </span>
               ))}
@@ -217,7 +217,7 @@ export const LandingPage: React.FC = () => {
           ].map(s => (
             <div key={s.value} className="bg-navy-mid border border-white/10 rounded-2xl p-6 md:p-8 shrink-0">
               <p className="font-bold text-xl md:text-2xl text-white mb-2 md:mb-3 leading-tight">{s.value}</p>
-              <p className="text-white/35 text-[9px] md:text-[10px] uppercase tracking-widest leading-relaxed whitespace-pre-line">{s.label}</p>
+              <p className="text-white/60 text-[9px] md:text-[10px] uppercase tracking-widest leading-relaxed whitespace-pre-line">{s.label}</p>
             </div>
           ))}
         </div>
@@ -236,15 +236,15 @@ export const LandingPage: React.FC = () => {
       <section className="relative z-10 max-w-[1200px] mx-auto px-6 md:px-10 pb-20 md:pb-24">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-10 items-start">
           {/* TODAY side */}
-          <div className="opacity-70 md:opacity-50 hover:opacity-100 transition-opacity">
-            <span className="inline-block border border-white/30 text-white/80 text-[9px] md:text-[10px] font-bold uppercase tracking-[0.12em] px-4 md:px-4.5 py-1.5 rounded-full mb-6">
+          <div>
+            <span className="inline-block border border-white/40 text-white/90 text-[9px] md:text-[10px] font-bold uppercase tracking-[0.12em] px-4 md:px-4.5 py-1.5 rounded-full mb-6">
               Today
             </span>
             <div className="bg-white/5 rounded-3xl p-6 md:p-8 border border-white/10">
               <ul className="list-none p-0 m-0 space-y-4">
                 {TODAY_ITEMS.map((item, i) => (
-                  <li key={i} className="flex gap-3.5 items-start text-white/70 text-xs md:text-[13px] leading-relaxed">
-                    <X size={16} className="shrink-0 mt-0.5 text-white/30" />
+                  <li key={i} className="flex gap-3.5 items-start text-white/90 text-xs md:text-[13px] leading-relaxed">
+                    <X size={16} className="shrink-0 mt-0.5 text-white/55" />
                     {item}
                   </li>
                 ))}
@@ -289,11 +289,11 @@ export const LandingPage: React.FC = () => {
             Request a Demo
           </button>
 
-          <p className="text-white/20 text-[9px] md:text-[10px] text-center md:text-left">
+          <p className="text-white/60 text-[10px] md:text-xs text-center md:text-left">
             © 2026 HALO · Pre-Contract Intelligence for Enterprise Bidding
           </p>
 
-          <p className="text-white/20 text-[9px] md:text-[10px] text-center md:text-right">
+          <p className="text-white/60 text-[10px] md:text-xs text-center md:text-right">
             Albert House, 256-260 Old Street · London EC1V 9DD
           </p>
         </div>
