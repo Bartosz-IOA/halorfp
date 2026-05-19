@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../supabase';
 import type { Analysis } from '../database.types';
+import { polishAnalysesForDisplay } from '../polishAnalysesForDisplay';
 
 export type AnalysisStatus = Analysis['status'];
 
@@ -33,7 +34,7 @@ export function useAnalyses(organizationId: string | undefined, options: UseAnal
 
       const { data, error } = await query;
       if (error) throw error;
-      return data as Analysis[];
+      return polishAnalysesForDisplay(data as Analysis[]);
     },
   });
 }

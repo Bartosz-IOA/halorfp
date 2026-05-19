@@ -30,11 +30,18 @@ export const useAuthStore = create<AuthState>((set) => ({
     const { data: { session } } = await supabase.auth.getSession();
     if (session?.user) {
       set({ user: session.user, isAuthenticated: true });
+      useEdgnexDemoStore.getState().hydrateForUser(session.user.id);
     }
 
     // Listen for auth changes (login, logout, token refresh)
     supabase.auth.onAuthStateChange((_event, session) => {
-      set({ user: session?.user || null, isAuthenticated: !!session?.user });
+      const user = session?.user ?? null;
+      set({ user, isAuthenticated: !!user });
+      if (user) {
+        useEdgnexDemoStore.getState().hydrateForUser(user.id);
+      } else {
+        useEdgnexDemoStore.getState().reset();
+      }
     });
   },
 
@@ -54,11 +61,11 @@ export const useAuthStore = create<AuthState>((set) => ({
       throw error;
     }
 
-    useEdgnexDemoStore.getState().reset();
     set({
       isAuthenticated: true,
       user: data.user,
     });
+    useEdgnexDemoStore.getState().hydrateForUser(data.user.id);
   },
 
   logout: async () => {

@@ -10,6 +10,8 @@ import {
   cn,
 } from '../../components/rfp/ResultPrimitives';
 import { useEdgnexSectionExpandBinding } from '../../contexts/EdgnexReportNavContext';
+import { CommentAnchor } from '../../components/comments/CommentAnchor';
+import { FeeSectionOverview } from '../../components/rfp/FeeSectionOverview';
 import {
   EDGNEX_FEE_ASSET_1_HEADER,
   EDGNEX_FEE_ASSET_2_HEADER,
@@ -17,9 +19,7 @@ import {
   EDGNEX_FEE_DISCIPLINE_PER_ASSET,
   EDGNEX_FEE_INFERRED_CAPTION,
   EDGNEX_FEE_KEY_ROWS,
-  EDGNEX_FEE_SECTION_OVERVIEW,
   EDGNEX_FEE_META,
-  EDGNEX_FEE_NOTES,
   EDGNEX_FEE_PORTFOLIO_DISCIPLINES,
   EDGNEX_FEE_PORTFOLIO_SUMMARY_LINE,
 } from '../../data/edgnexFeeEstimation';
@@ -152,6 +152,7 @@ export const FeeEstimationSection: React.FC = () => {
   const bindFeeExpand = useEdgnexSectionExpandBinding('edgnex-fee');
 
   return (
+    <CommentAnchor anchorId="edgnex-fee" label="Fee estimation" scopeOnly>
     <AccordionSection
       sectionId="edgnex-fee"
       number="03"
@@ -171,7 +172,7 @@ export const FeeEstimationSection: React.FC = () => {
           title={EDGNEX_FEE_META.title}
           subtitle={EDGNEX_FEE_META.projectLine}
           generatedLabel={EDGNEX_FEE_META.generatedLabel}
-          intro={EDGNEX_FEE_SECTION_OVERVIEW}
+          introContent={<FeeSectionOverview />}
           footer={<ReferenceInfoList rows={EDGNEX_FEE_KEY_ROWS} />}
         />
 
@@ -181,6 +182,8 @@ export const FeeEstimationSection: React.FC = () => {
           </p>
 
           <CollapsibleSubsection
+            commentPrefix="edgnex-fee"
+            commentSectionLabel="Fee model"
             title="Asset-level summary (AED)"
             defaultOpen
             summary="CAPEX, fee %, and total design fee by asset and portfolio roll-up."
@@ -189,6 +192,8 @@ export const FeeEstimationSection: React.FC = () => {
           </CollapsibleSubsection>
 
           <CollapsibleSubsection
+            commentPrefix="edgnex-fee"
+            commentSectionLabel="Fee model"
             title="Per-asset discipline breakdown — Asset 1 (Dhahran)"
             summary={EDGNEX_FEE_ASSET_1_HEADER}
           >
@@ -201,6 +206,8 @@ export const FeeEstimationSection: React.FC = () => {
           </CollapsibleSubsection>
 
           <CollapsibleSubsection
+            commentPrefix="edgnex-fee"
+            commentSectionLabel="Fee model"
             title="Per-asset discipline breakdown — Asset 2 (Dammam)"
             summary={EDGNEX_FEE_ASSET_2_HEADER}
           >
@@ -213,6 +220,8 @@ export const FeeEstimationSection: React.FC = () => {
           </CollapsibleSubsection>
 
           <CollapsibleSubsection
+            commentPrefix="edgnex-fee"
+            commentSectionLabel="Fee model"
             title="Portfolio discipline summary — all assets combined"
             summary={EDGNEX_FEE_PORTFOLIO_SUMMARY_LINE}
           >
@@ -220,18 +229,9 @@ export const FeeEstimationSection: React.FC = () => {
             <PortfolioDisciplineTable />
           </CollapsibleSubsection>
 
-          <CollapsibleSubsection
-            title="Methodology notes"
-            summary="FX, CAPEX tiers, discipline coverage, and inferred-value labelling."
-          >
-            <ol className="list-decimal pl-5 space-y-2 text-xs text-navy-primary leading-relaxed">
-              {EDGNEX_FEE_NOTES.map((note, i) => (
-                <li key={i}>{note}</li>
-              ))}
-            </ol>
-          </CollapsibleSubsection>
         </div>
       </div>
     </AccordionSection>
+    </CommentAnchor>
   );
 };

@@ -1,11 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../supabase';
 import { useAuthStore } from '../../store/useAuthStore';
+import { useCommentsStore } from '../../store/useCommentsStore';
 
 interface CreateAnalysisInput {
   organizationId: string;
   name: string;
-  comment?: string;
 }
 
 // Creates a new analysis row and invalidates the list so RfpListPage
@@ -22,7 +22,7 @@ export function useCreateAnalysis() {
           organization_id: input.organizationId,
           created_by:      user!.id,
           name:            input.name,
-          comment:         input.comment ?? null,
+          comment:         null,
           status:          'queued' as const,
         })
         .select('id')
@@ -31,8 +31,9 @@ export function useCreateAnalysis() {
       if (error) throw error;
       return data;
     },
-    onSuccess: (_, input) => {
-      // Invalidate the list so it picks up the new row immediately.
+    onSuccess: (data, input) => {
+      useCommentsStore.getState().clearCommentsForAnalysis(data.id);
+      useCommentsStore.getState().closeCommentMode();
       queryClient.invalidateQueries({ queryKey: ['analyses', input.organizationId] });
     },
   });

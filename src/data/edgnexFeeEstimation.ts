@@ -4,9 +4,18 @@ export const EDGNEX_FEE_META = {
   generatedLabel: 'Generated 13/05/2026',
 } as const;
 
-/** Opening narrative under the fee report hero (methodology and how to read the section). */
-export const EDGNEX_FEE_SECTION_OVERVIEW =
-  'This section turns the RFP scope into indicative design-fee levels for the two data centre assets. The fee analysis rolls up construction cost density into CAPEX, applies tier-based design-fee percentages, then splits results by discipline so you can compare asset-level and portfolio totals, sanity-check assumptions against the scoring narrative, and see where FX, GFA, or typology would move the numbers.';
+/** Structured opening under the fee report hero. */
+export const EDGNEX_FEE_SECTION_OVERVIEW = {
+  purpose:
+    'This section turns the RFP scope into indicative design-fee levels for the two data centre assets.',
+  steps: [
+    'Roll construction cost density into CAPEX per asset.',
+    'Apply tier-based design-fee percentages to each CAPEX band.',
+    'Split results by discipline for asset-level and portfolio comparison.',
+  ],
+  usage:
+    'Use the tables below to sanity-check assumptions against the scoring narrative and to see where FX, GFA, or typology would move the numbers.',
+} as const;
 
 export const EDGNEX_FEE_KEY_ROWS: {
   label: string;

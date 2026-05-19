@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../supabase';
 import type { Analysis, AnalysisFile, AnalysisSection, AnalysisImage } from '../database.types';
+import { polishAnalysisForDisplay } from '../polishAnalysesForDisplay';
 
 export interface AnalysisDetail extends Analysis {
   analysis_files: AnalysisFile[];
@@ -28,7 +29,7 @@ export function useAnalysis(id: string | undefined) {
 
       if (error) throw error;
 
-      const detail = data as AnalysisDetail;
+      const detail = polishAnalysisForDisplay(data as AnalysisDetail) as AnalysisDetail;
       detail.analysis_sections.sort((a, b) => a.position - b.position);
       detail.analysis_images.sort((a, b) => a.position - b.position);
       return detail;

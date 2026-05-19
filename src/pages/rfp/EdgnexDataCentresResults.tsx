@@ -30,6 +30,9 @@ import {
   downloadSourceDocument,
   type SourceDocumentItem,
 } from '../../lib/sourceDocumentDownload';
+import { CommentAnchor } from '../../components/comments/CommentAnchor';
+import { CommentsModeBanner } from '../../components/comments/CommentsModeBanner';
+import { buildCommentAnchorId, buildCommentLabel } from '../../lib/commentAnchorId';
 
 const FidicContractAnalysisSection = lazy(() =>
   import('./FidicContractAnalysisSection').then((m) => ({ default: m.FidicContractAnalysisSection })),
@@ -142,7 +145,13 @@ function SourceDocumentCard({
   isDownloading: boolean;
 }) {
   return (
-    <article className="flex flex-col rounded-xl border border-border/80 bg-white p-4 shadow-sm ring-1 ring-black/[0.02] transition hover:border-navy-mid/20 hover:shadow-md">
+    <CommentAnchor
+      anchorId={buildCommentAnchorId('edgnex-sources', doc.name)}
+      label={buildCommentLabel('Sources', doc.name)}
+      variant="inline"
+      className="h-full"
+    >
+    <article className="flex flex-col rounded-xl border border-border/80 bg-white p-4 shadow-sm ring-1 ring-black/[0.02] transition hover:border-navy-mid/20 hover:shadow-md h-full">
       <div className="flex items-start gap-3">
         <div
           className={cn(
@@ -184,6 +193,7 @@ function SourceDocumentCard({
         </button>
       </div>
     </article>
+    </CommentAnchor>
   );
 }
 
@@ -334,6 +344,7 @@ const EdgnexDataCentresResultsContent: React.FC = () => {
   return (
     <div className="min-h-full overflow-x-hidden font-sans bg-off-white bg-[radial-gradient(ellipse_120%_80%_at_50%_-20%,rgba(26,46,69,0.06),transparent)] print:bg-white">
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10 space-y-6 sm:space-y-8 pb-16">
+        <CommentsModeBanner />
         <header className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
             <div>
@@ -389,7 +400,8 @@ const EdgnexDataCentresResultsContent: React.FC = () => {
           </nav>
         </header>
 
-        <div id="edgnex-overview" className="scroll-mt-32 space-y-6 lg:space-y-8">
+        <CommentAnchor anchorId="edgnex-overview" label="Overview" asSection scopeOnly className="scroll-mt-32 space-y-6 lg:space-y-8">
+          <CommentAnchor anchorId="overview-at-glance" label="Overview · At a glance" variant="inline">
           <section
             aria-label="Assessment scores at a glance"
             className={cn(analysisReportCard, 'p-4 sm:p-5')}
@@ -434,6 +446,7 @@ const EdgnexDataCentresResultsContent: React.FC = () => {
               </div>
             </div>
           </section>
+          </CommentAnchor>
 
           <div className={cn(analysisReportCard, 'relative overflow-hidden p-5 sm:p-6 lg:p-8')}>
             <div
@@ -449,7 +462,7 @@ const EdgnexDataCentresResultsContent: React.FC = () => {
               </p>
             </div>
 
-            <div className="rounded-xl border border-amber-200/60 bg-gradient-to-br from-amber-50/90 to-orange-50/20 p-4 sm:p-5 mb-8 ring-1 ring-amber-900/[0.04]">
+            <CommentAnchor anchorId="overview-verdict" label="Overview · Verdict at a glance" variant="inline" className="rounded-xl border border-amber-200/60 bg-gradient-to-br from-amber-50/90 to-orange-50/20 p-4 sm:p-5 mb-8 ring-1 ring-amber-900/[0.04]">
               <h3 className="text-[10px] font-bold text-amber-900/80 uppercase tracking-[0.2em] mb-2">
                 Verdict at a glance
               </h3>
@@ -460,13 +473,15 @@ const EdgnexDataCentresResultsContent: React.FC = () => {
                 <span className="font-bold text-red-600">Decline</span> based on score band, programme compression,
                 and commercial exposures.
               </p>
-            </div>
+            </CommentAnchor>
 
             <h3 className="text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em] mb-4">
               Executive summary
             </h3>
             <div className="mb-10">
               <ReferenceInfoList
+                commentPrefix="overview-exec"
+                commentSectionLabel="Overview"
                 rows={EDGNEX_EXEC_SUMMARY.map((block) =>
                   block.reference
                     ? {
@@ -497,6 +512,8 @@ const EdgnexDataCentresResultsContent: React.FC = () => {
             </h3>
             <div className="mb-8">
               <ReferenceInfoList
+                commentPrefix="overview-facts"
+                commentSectionLabel="Overview"
                 rows={EDGNEX_KEY_FACTS.map((item) => ({
                   label: item.label,
                   value: item.value,
@@ -566,8 +583,9 @@ const EdgnexDataCentresResultsContent: React.FC = () => {
               </span>
             </div>
           </div>
-        </div>
+        </CommentAnchor>
 
+        <CommentAnchor anchorId="edgnex-sources" label="Source documents" scopeOnly>
         <AccordionSection
           sectionId="edgnex-sources"
           number="00"
@@ -623,8 +641,10 @@ const EdgnexDataCentresResultsContent: React.FC = () => {
             ))}
           </div>
         </AccordionSection>
+        </CommentAnchor>
 
         <div className="space-y-4">
+          <CommentAnchor anchorId="edgnex-scoring" label="Go / No-Go scoring" scopeOnly>
           <AccordionSection
             sectionId="edgnex-scoring"
             number="01"
@@ -657,7 +677,7 @@ const EdgnexDataCentresResultsContent: React.FC = () => {
 
             <div className="space-y-1.5 min-w-0 overflow-hidden">
               {EDGNEX_GO_NO_GO.map((row) => (
-                <GoNoGoRow key={row.id} data={row} />
+                <GoNoGoRow key={row.id} data={row} commentScope="edgnex-scoring" commentSectionLabel="Scoring" />
               ))}
             </div>
 
@@ -713,6 +733,7 @@ const EdgnexDataCentresResultsContent: React.FC = () => {
               workbook from the team if you need a spreadsheet for workshops.
             </p>
           </AccordionSection>
+          </CommentAnchor>
 
           <Suspense
             fallback={

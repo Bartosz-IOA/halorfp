@@ -1,10 +1,13 @@
 // src/pages/rfp/RfpListPage.tsx
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Plus, FileText, Clock, ChevronRight, Search, Filter } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useCurrentOrg, useAnalyses } from '../../lib/queries';
 import type { AnalysisStatus } from '../../lib/database.types';
+import { mergeSessionAnalyses } from '../../lib/sessionAnalyses';
+import { useEdgnexDemoStore } from '../../store/useEdgnexDemoStore';
+import { useAuthStore } from '../../store/useAuthStore';
 
 const StatusBadge = ({ status }: { status: AnalysisStatus }) => {
   const styles: Record<AnalysisStatus, string> = {
@@ -46,10 +49,34 @@ export const RfpListPage: React.FC = () => {
   const [search, setSearch] = useState('');
   const navigate = useNavigate();
 
+  const user = useAuthStore((s) => s.user);
+  const isEdgnexVisible = useEdgnexDemoStore((s) => s.isVisible);
+  const isEdgnexProcessing = useEdgnexDemoStore((s) => s.isProcessingFromNewFlow);
+  const edgnexCreatedAt = useEdgnexDemoStore((s) => s.createdAt);
+
   const { data: membership, isLoading: orgLoading } = useCurrentOrg();
   const { data: analyses, isLoading: analysesLoading, error } = useAnalyses(
     membership?.organization_id,
     { search: search || undefined }
+  );
+
+  const displayAnalyses = useMemo(
+    () =>
+      mergeSessionAnalyses(analyses ?? [], membership?.organization_id, user?.id, {
+        edgnexVisible: isEdgnexVisible,
+        edgnexProcessing: isEdgnexProcessing,
+        edgnexCreatedAt,
+        search: search || undefined,
+      }),
+    [
+      analyses,
+      membership?.organization_id,
+      user?.id,
+      isEdgnexVisible,
+      isEdgnexProcessing,
+      edgnexCreatedAt,
+      search,
+    ],
   );
 
   const isLoading = orgLoading || analysesLoading;
@@ -72,7 +99,7 @@ export const RfpListPage: React.FC = () => {
     );
   }
 
-  if (!analyses || analyses.length === 0) {
+  if (displayAnalyses.length === 0) {
     return (
       <div className="h-full flex flex-col items-center justify-center p-4 md:p-8 text-center bg-white my-4 md:m-8 rounded-xl border border-dashed border-border">
         <div className="w-16 h-16 bg-off-white rounded-full flex items-center justify-center mb-6">
@@ -95,7 +122,7 @@ export const RfpListPage: React.FC = () => {
       {/* Header Row */}
       <div className="flex items-center justify-between mb-4">
         <div>
-          <p className="text-xs text-text-secondary">{analyses.length} analyses total</p>
+          <p className="text-xs text-text-secondary">{displayAnalyses.length} analyses total</p>
           <p className="text-text-secondary text-xs md:text-sm hidden sm:block">Review past analyses or start a new one.</p>
         </div>
         <NavLink to="/rfp/new" className="btn btn-primary px-4 py-2 text-sm flex items-center gap-1.5 shrink-0">
@@ -124,7 +151,7 @@ export const RfpListPage: React.FC = () => {
 
       {/* Cards List */}
       <div className="space-y-2">
-        {analyses.map((analysis) => {
+        {displayAnalyses.map((analysis) => {
           const isProcessing = analysis.status === 'processing' || analysis.status === 'queued';
           return (
             <motion.div

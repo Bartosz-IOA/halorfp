@@ -80,6 +80,7 @@ export const NewAnalysisPage: React.FC = () => {
     if (files.filter(f => f.status === 'SUCCESS').length === 0) return;
 
     setIsSubmitting(true);
+    setComment('');
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1500));
     beginDemoFromNewAnalysis();

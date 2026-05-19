@@ -7,7 +7,47 @@ export const EDGNEX_FIDIC_META = {
 export const EDGNEX_FIDIC_INTRO =
   'This review benchmarks the supplied contract against the FIDIC White Book 2017. It summarises contract metadata, top risk items, clause-by-clause comparison, missing protections, and drafting issues identified in the retrieved documents.';
 
-export const EDGNEX_FIDIC_EXEC_SUMMARY = `This RFP document set for the EDGNEX/DAMAC Dhahran and Dammam Data Center Lead Consultancy presents a contract risk profile that DSA Architects must rate as Critical before proceeding to bid. The four most dangerous exposures are: (1) the complete absence of a limitation of liability cap across all retrieved documents, leaving DSA with unlimited exposure on a 50-200 MW hyperscale facility; (2) the requirement under Section 2.1.7.1(d) for DSA to assume AOR liability for all third-party designs without a paid review period or Employer indemnity — a provision that is likely uninsurable under standard PI terms; (3) uncapped delay penalties deducted 'notwithstanding any objections' under Section 9.3H, combined with an Employer discretion to deduct for design deficiencies with no process or cap; and (4) the complete absence of a dispute resolution clause, meaning DSA has no contractual mechanism to challenge deductions, recover withheld payments or resolve disagreements short of litigation. Compounding these structural risks are a material LD basis inconsistency between the Commercial T&Cs and Section 9.3H, an open-ended scope against a fixed lump sum, and the surrender of DSA's proposal IP to DAMAC unconditionally. DSA should not submit a proposal unless DAMAC agrees in pre-bid negotiations to: insert a liability cap, remove the third-party AOR liability assumption, cap and qualify the delay penalty regime, insert a dispute resolution clause, and clarify the LD calculation basis.`;
+/** @deprecated Use EDGNEX_FIDIC_EXEC_SUMMARY_CONTENT for UI. Kept for exports / search. */
+export const EDGNEX_FIDIC_EXEC_SUMMARY = `This RFP document set for the EDGNEX/DAMAC Dhahran and Dammam Data Center Lead Consultancy presents a contract risk profile that DSA Architects must rate as Critical before proceeding to bid.`;
+
+export const EDGNEX_FIDIC_EXEC_SUMMARY_CONTENT = {
+  lead: 'This RFP document set for the EDGNEX/DAMAC Dhahran and Dammam Data Center Lead Consultancy presents a contract risk profile that DSA Architects must rate as Critical before proceeding to bid.',
+  topExposures: [
+    {
+      title: 'No limitation of liability cap',
+      detail:
+        'Complete absence of a cap across all retrieved documents, leaving DSA with unlimited exposure on a 50–200 MW hyperscale facility.',
+    },
+    {
+      title: 'Third-party AOR assumption (Section 2.1.7.1(d))',
+      detail:
+        'DSA must assume AOR liability for all third-party designs without a paid review period or Employer indemnity — likely uninsurable under standard PI terms.',
+    },
+    {
+      title: 'Uncapped delay penalties (Section 9.3H)',
+      detail:
+        "Penalties deducted 'notwithstanding any objections', combined with Employer discretion to deduct for design deficiencies with no process or cap.",
+    },
+    {
+      title: 'No dispute resolution clause',
+      detail:
+        'No contractual mechanism to challenge deductions, recover withheld payments, or resolve disagreements short of litigation.',
+    },
+  ],
+  compounding: [
+    'Material LD basis inconsistency between the Commercial T&Cs and Section 9.3H.',
+    'Open-ended scope against a fixed lump sum.',
+    "Unconditional surrender of DSA's proposal IP to DAMAC.",
+  ],
+  negotiationIntro: 'DSA should not submit a proposal unless DAMAC agrees in pre-bid negotiations to:',
+  negotiationItems: [
+    'Insert a limitation of liability cap.',
+    'Remove the third-party AOR liability assumption (or qualify with review period and indemnity).',
+    'Cap and qualify the delay penalty regime.',
+    'Insert a dispute resolution clause.',
+    'Clarify the LD calculation basis in writing.',
+  ],
+} as const;
 
 export const EDGNEX_FIDIC_OVERALL_RATING = 'CRITICAL' as const;
 

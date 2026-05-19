@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import type { GoNoGoRowData } from '../../types/rfpAssessment';
+import { CommentAnchor } from '../comments/CommentAnchor';
+import { buildCommentAnchorId, buildCommentLabel } from '../../lib/commentAnchorId';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -74,7 +76,16 @@ export type ReferenceInfoListRow = {
 /**
  * Vertical “key facts” list: label | value | info icon. Hover/focus shows tooltip; tap/click the icon pins it open until dismissed or click outside.
  */
-export const ReferenceInfoList = ({ rows }: { rows: ReferenceInfoListRow[] }) => {
+export const ReferenceInfoList = ({
+  rows,
+  commentPrefix,
+  commentSectionLabel,
+}: {
+  rows: ReferenceInfoListRow[];
+  /** When set, each row becomes its own comment target. */
+  commentPrefix?: string;
+  commentSectionLabel?: string;
+}) => {
   const [pinnedRow, setPinnedRow] = useState<number | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -100,11 +111,8 @@ export const ReferenceInfoList = ({ rows }: { rows: ReferenceInfoListRow[] }) =>
           Boolean(row.referenceSource?.trim());
         const isPinned = pinnedRow === idx;
 
-        return (
-          <div
-            key={`${idx}-${row.label}`}
-            className="relative flex items-start gap-3 border-b border-border/70 px-4 py-3.5 last:border-b-0 sm:gap-4 sm:px-5 sm:py-4"
-          >
+        const rowInner = (
+          <div className="relative flex items-start gap-3 border-b border-border/70 px-4 py-3.5 last:border-b-0 sm:gap-4 sm:px-5 sm:py-4">
             <div className="w-[132px] shrink-0 pt-0.5 text-[11px] font-bold uppercase leading-snug tracking-wide text-text-secondary sm:w-[172px]">
               {row.label}
             </div>
@@ -168,6 +176,21 @@ export const ReferenceInfoList = ({ rows }: { rows: ReferenceInfoListRow[] }) =>
             )}
           </div>
         );
+
+        if (commentPrefix && commentSectionLabel) {
+          return (
+            <CommentAnchor
+              key={`${idx}-${row.label}`}
+              anchorId={buildCommentAnchorId(commentPrefix, row.label)}
+              label={buildCommentLabel(commentSectionLabel, row.label)}
+              variant="inline"
+            >
+              {rowInner}
+            </CommentAnchor>
+          );
+        }
+
+        return <React.Fragment key={`${idx}-${row.label}`}>{rowInner}</React.Fragment>;
       })}
     </div>
   );
@@ -227,6 +250,7 @@ export const AnalysisReportHero = ({
   generatedLabel,
   benchmarkLine,
   intro,
+  introContent,
   leadWord,
   footer,
 }: {
@@ -235,7 +259,10 @@ export const AnalysisReportHero = ({
   subtitle?: string;
   generatedLabel: string;
   benchmarkLine?: string;
-  intro: string;
+  /** Plain-text intro (ignored when introContent is set). */
+  intro?: string;
+  /** Structured intro block (preferred for long narratives). */
+  introContent?: React.ReactNode;
   /** Optional short lead-in (e.g. section label). Omit for a direct narrative opening. */
   leadWord?: string;
   footer?: React.ReactNode;
@@ -260,18 +287,22 @@ export const AnalysisReportHero = ({
         </span>
       )}
     </div>
-    <div className="mt-5 border-t border-border/70 pt-5">
-      <p className="text-sm text-text-primary leading-relaxed max-w-prose">
-        {leadWord ? (
-          <>
-            <span className="font-semibold text-navy-primary">{leadWord}</span>
-            <br />
-            <br />
-          </>
-        ) : null}
-        {intro}
-      </p>
-    </div>
+    {(introContent || intro) && (
+      <div className="mt-5 border-t border-border/70 pt-5">
+        {introContent ?? (
+          <p className="text-sm text-text-primary leading-relaxed max-w-prose">
+            {leadWord ? (
+              <>
+                <span className="font-semibold text-navy-primary">{leadWord}</span>
+                <br />
+                <br />
+              </>
+            ) : null}
+            {intro}
+          </p>
+        )}
+      </div>
+    )}
     {footer && <div className="mt-5 border-t border-border/70 pt-5">{footer}</div>}
   </header>
 );
@@ -391,6 +422,8 @@ export const CollapsibleSubsection = ({
   children,
   anchorId,
   className,
+  commentPrefix,
+  commentSectionLabel,
 }: {
   title: string;
   summary?: string;
@@ -400,6 +433,8 @@ export const CollapsibleSubsection = ({
   children: React.ReactNode;
   anchorId?: string;
   className?: string;
+  commentPrefix?: string;
+  commentSectionLabel?: string;
 }) => {
   const [open, setOpen] = useState(defaultOpen);
   const regionId = useId();
@@ -477,7 +512,17 @@ export const CollapsibleSubsection = ({
                   : 'px-4 pb-4 pl-11 pr-4 pt-3.5 text-sm',
               )}
             >
-              {children}
+              {commentPrefix && commentSectionLabel ? (
+                <CommentAnchor
+                  anchorId={buildCommentAnchorId(commentPrefix, title)}
+                  label={buildCommentLabel(commentSectionLabel, title)}
+                  variant="block"
+                >
+                  {children}
+                </CommentAnchor>
+              ) : (
+                children
+              )}
             </div>
           </motion.div>
         )}
@@ -509,7 +554,15 @@ function goNoGoFaintTrackClass(data: GoNoGoRowData, isScoredZero: boolean) {
   return 'bg-slate-100/90';
 }
 
-export const GoNoGoRow = ({ data }: { data: GoNoGoRowData }) => {
+export const GoNoGoRow = ({
+  data,
+  commentScope,
+  commentSectionLabel = 'Scoring',
+}: {
+  data: GoNoGoRowData;
+  commentScope?: string;
+  commentSectionLabel?: string;
+}) => {
   const [open, setOpen] = useState(false);
   const inputState = resolveGoNoGoInputState(data);
   const isDisconnected = inputState === 'disconnected';
@@ -527,7 +580,7 @@ export const GoNoGoRow = ({ data }: { data: GoNoGoRowData }) => {
         ? `— / ${data.max}`
         : `${data.score} / ${data.max}`;
 
-  return (
+  const row = (
     <div className="mb-2 min-w-0">
       <button
         type="button"
@@ -545,7 +598,7 @@ export const GoNoGoRow = ({ data }: { data: GoNoGoRowData }) => {
         onClick={() => setOpen(!open)}
         aria-expanded={open}
       >
-        <div className="text-xs text-navy-primary font-semibold sm:truncate pr-1 leading-snug">{data.name}</div>
+        <div className="text-sm text-navy-primary font-semibold sm:truncate pr-1 leading-snug">{data.name}</div>
 
         <div
           className={cn(
@@ -681,5 +734,17 @@ export const GoNoGoRow = ({ data }: { data: GoNoGoRowData }) => {
         )}
       </AnimatePresence>
     </div>
+  );
+
+  if (!commentScope) return row;
+
+  return (
+    <CommentAnchor
+      anchorId={buildCommentAnchorId(commentScope, data.id)}
+      label={buildCommentLabel(commentSectionLabel, data.name)}
+      variant="inline"
+    >
+      {row}
+    </CommentAnchor>
   );
 };

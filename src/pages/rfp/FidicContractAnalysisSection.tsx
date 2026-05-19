@@ -10,11 +10,12 @@ import {
   cn,
 } from '../../components/rfp/ResultPrimitives';
 import { useEdgnexSectionExpandBinding } from '../../contexts/EdgnexReportNavContext';
+import { CommentAnchor } from '../../components/comments/CommentAnchor';
+import { FidicExecutiveSummary } from '../../components/rfp/FidicExecutiveSummary';
 import {
   EDGNEX_FIDIC_CLAUSE_ROWS,
   EDGNEX_FIDIC_CONTRACT_DETAILS,
   EDGNEX_FIDIC_DRAFTING_ERROR_ITEMS,
-  EDGNEX_FIDIC_EXEC_SUMMARY,
   EDGNEX_FIDIC_INTRO,
   EDGNEX_FIDIC_META,
   EDGNEX_FIDIC_MISSING_PROTECTION_ITEMS,
@@ -234,6 +235,7 @@ export const FidicContractAnalysisSection: React.FC = () => {
   );
 
   return (
+    <CommentAnchor anchorId="edgnex-fidic" label="Contract analysis (FIDIC)" scopeOnly>
     <AccordionSection
       sectionId="edgnex-fidic"
       number="02"
@@ -278,15 +280,19 @@ export const FidicContractAnalysisSection: React.FC = () => {
           </p>
 
           <CollapsibleSubsection
+            commentPrefix="edgnex-fidic"
+            commentSectionLabel="Contract"
             anchorId="fidic-ss-exec"
             title="Executive summary"
             defaultOpen
             summary="Overall risk narrative and negotiation prerequisites."
           >
-            <p className="text-sm leading-relaxed whitespace-pre-wrap">{EDGNEX_FIDIC_EXEC_SUMMARY}</p>
+            <FidicExecutiveSummary />
           </CollapsibleSubsection>
 
           <CollapsibleSubsection
+            commentPrefix="edgnex-fidic"
+            commentSectionLabel="Contract"
             anchorId="fidic-ss-rating"
             title="Overall risk rating & contract details"
             summary={`Rating: ${EDGNEX_FIDIC_OVERALL_RATING} · Client, project, law, and commercial metadata.`}
@@ -298,20 +304,22 @@ export const FidicContractAnalysisSection: React.FC = () => {
             <h5 className="text-[10px] font-bold text-text-secondary uppercase tracking-widest mb-3">
               Contract details
             </h5>
-            <dl className="space-y-2">
+            <dl className="divide-y divide-border/70 text-xs">
               {EDGNEX_FIDIC_CONTRACT_DETAILS.map((row) => (
                 <div
                   key={row.label}
-                  className="rounded-xl border border-border/60 bg-off-white/40 px-4 py-3 grid grid-cols-1 md:grid-cols-[140px_1fr] gap-1 md:gap-4 text-xs"
+                  className="grid grid-cols-1 gap-1 py-3.5 md:grid-cols-[140px_1fr] md:gap-4 md:items-start"
                 >
                   <dt className="font-bold text-text-secondary shrink-0">{row.label}</dt>
-                  <dd className="text-navy-primary leading-relaxed">{row.value}</dd>
+                  <dd className="m-0 text-navy-primary leading-relaxed">{row.value}</dd>
                 </div>
               ))}
             </dl>
           </CollapsibleSubsection>
 
           <CollapsibleSubsection
+            commentPrefix="edgnex-fidic"
+            commentSectionLabel="Contract"
             anchorId="fidic-ss-risks"
             title="Top 10 risk items"
             summary="Ranked exposures with clause references, severity, and DSA position."
@@ -391,6 +399,8 @@ export const FidicContractAnalysisSection: React.FC = () => {
           </CollapsibleSubsection>
 
           <CollapsibleSubsection
+            commentPrefix="edgnex-fidic"
+            commentSectionLabel="Contract"
             anchorId="fidic-ss-clauses"
             title="Clause-by-clause analysis"
             summary="Twelve clauses vs FIDIC White Book 2017 — expand each clause for full text, amendment, and rationale."
@@ -429,6 +439,8 @@ export const FidicContractAnalysisSection: React.FC = () => {
                 >
                   {filteredClauseRows.map((row) => (
                     <CollapsibleSubsection
+                      commentPrefix="edgnex-fidic"
+                      commentSectionLabel="Contract"
                       key={row.clauseRef}
                       nested
                       title={row.topic}
@@ -481,6 +493,8 @@ export const FidicContractAnalysisSection: React.FC = () => {
           </CollapsibleSubsection>
 
           <CollapsibleSubsection
+            commentPrefix="edgnex-fidic"
+            commentSectionLabel="Contract"
             anchorId="fidic-ss-missing"
             title="Missing protections"
             summary={`${EDGNEX_FIDIC_MISSING_PROTECTION_ITEMS.length} standard protections not found in the retrieved RFP set`}
@@ -499,6 +513,8 @@ export const FidicContractAnalysisSection: React.FC = () => {
           </CollapsibleSubsection>
 
           <CollapsibleSubsection
+            commentPrefix="edgnex-fidic"
+            commentSectionLabel="Contract"
             anchorId="fidic-ss-drafting"
             title="Drafting errors & inconsistencies"
             summary={`${EDGNEX_FIDIC_DRAFTING_ERROR_ITEMS.length} cross-reference, scope, and commercial ambiguities`}
@@ -518,5 +534,6 @@ export const FidicContractAnalysisSection: React.FC = () => {
         </div>
       </div>
     </AccordionSection>
+    </CommentAnchor>
   );
 };
