@@ -339,6 +339,48 @@ export const EDGNEX_FIDIC_CLAUSE_ROWS: FidicClauseRow[] = [
   },
 ];
 
+export type FidicCatalogItem = {
+  id: string;
+  title: string;
+  detail: string;
+  category: string;
+};
+
+function parseEmDashItem(text: string, id: string, category: string): FidicCatalogItem {
+  const sep = text.indexOf(' — ');
+  if (sep === -1) return { id, title: text, detail: '', category };
+  return {
+    id,
+    title: text.slice(0, sep).trim(),
+    detail: text.slice(sep + 3).trim(),
+    category,
+  };
+}
+
+function parseColonItem(text: string, id: string): FidicCatalogItem {
+  const sep = text.indexOf(': ');
+  const title = sep === -1 ? text.trim() : text.slice(0, sep).trim();
+  return {
+    id,
+    title,
+    detail: sep === -1 ? '' : text.slice(sep + 2).trim(),
+    category: draftingIssueCategory(title),
+  };
+}
+
+function draftingIssueCategory(title: string): string {
+  const t = title.toLowerCase();
+  if (t.includes('inconsistency') || t.includes('inconsistent')) return 'Inconsistency';
+  if (t.includes('tbc')) return 'Unresolved scope';
+  if (t.includes('not retrieved') || t.includes('cross-reference') || t.includes('article')) {
+    return 'Missing document';
+  }
+  if (t.includes('revision table') || t.includes('version-control')) return 'Document control';
+  if (t.includes('provided later')) return 'Missing input';
+  if (t.includes('payment') || t.includes('milestone')) return 'Commercial ambiguity';
+  return 'Drafting gap';
+}
+
 export const EDGNEX_FIDIC_MISSING_PROTECTIONS: string[] = [
   'Limitation of liability cap — no clause found in any retrieved document; DSA faces unlimited liability for all claims arising from the Services',
   'Consequential and indirect loss exclusion — no clause found; DSA is exposed to claims for loss of data centre revenue, business interruption and third-party losses on a 50-200 MW hyperscale facility',
@@ -356,6 +398,10 @@ export const EDGNEX_FIDIC_MISSING_PROTECTIONS: string[] = [
   'Standard of care definition — no clause found defining the standard of care (reasonable skill and care vs fitness for purpose); the Uptime Tier III and TIA-942 compliance requirements could be interpreted as fitness-for-purpose obligations',
 ];
 
+export const EDGNEX_FIDIC_MISSING_PROTECTION_ITEMS: FidicCatalogItem[] = EDGNEX_FIDIC_MISSING_PROTECTIONS.map(
+  (text, i) => parseEmDashItem(text, `missing-${i + 1}`, 'Not in retrieved pack'),
+);
+
 export const EDGNEX_FIDIC_DRAFTING_ERRORS: string[] = [
   "LD basis inconsistency: Commercial Qualifications xlsx specifies LD at '0.5% of the Contract Value per week' while Section 9.3H of Proposal Schedules specifies '0.5% of the portion of the Remuneration per week' — these are materially different calculation bases that must be reconciled before contract execution",
   "Section 9.2 payment table contains two separate Stage 4 entries both described as 'Upon formal approval of Enabling and Early Works, including Shell and Core Package' at 15% and 20% respectively — the distinction between these two identical milestone descriptions is unclear and creates payment ambiguity",
@@ -367,3 +413,7 @@ export const EDGNEX_FIDIC_DRAFTING_ERRORS: string[] = [
   'The document revision table in PART 1A (p.15) contains blank Author, Reviewer and Approved for Issue fields — the document has not been formally approved or version-controlled, raising questions about its contractual status',
   "Section 2.1.1 refers to 'Article 0 of the Agreement' for definitions but the Agreement (RFP Part 3) was not retrieved — key defined terms may differ between the Services Brief and the Agreement",
 ];
+
+export const EDGNEX_FIDIC_DRAFTING_ERROR_ITEMS: FidicCatalogItem[] = EDGNEX_FIDIC_DRAFTING_ERRORS.map((text, i) =>
+  parseColonItem(text, `draft-${i + 1}`),
+);

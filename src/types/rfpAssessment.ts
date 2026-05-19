@@ -20,6 +20,9 @@ export type GoNoGoDetail = {
   ref: string;
 };
 
+/** How criterion input is represented in the matrix UI. */
+export type GoNoGoInputState = 'scored' | 'unselected' | 'disconnected';
+
 export type GoNoGoRowData = {
   id: string;
   name: string;
@@ -28,5 +31,7 @@ export type GoNoGoRowData = {
   text: string;
   color: string;
   isBlocker?: boolean;
+  /** Defaults to `scored` when omitted. */
+  inputState?: GoNoGoInputState;
   details: GoNoGoDetail[];
 };

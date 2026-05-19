@@ -4,11 +4,7 @@ export const EDGNEX_FEE_META = {
   generatedLabel: 'Generated 13/05/2026',
 } as const;
 
-/** Short line under the fee report hero title (methodology, no named framework). */
-export const EDGNEX_FEE_INTRO =
-  'Three-step model in AED: CAPEX → design fee % → discipline split (details in key facts below).';
-
-/** Opening paragraph for the fee accordion: what this section contains and how the analysis is meant to be read. */
+/** Opening narrative under the fee report hero (methodology and how to read the section). */
 export const EDGNEX_FEE_SECTION_OVERVIEW =
   'This section turns the RFP scope into indicative design-fee levels for the two data centre assets. The fee analysis rolls up construction cost density into CAPEX, applies tier-based design-fee percentages, then splits results by discipline so you can compare asset-level and portfolio totals, sanity-check assumptions against the scoring narrative, and see where FX, GFA, or typology would move the numbers.';
 

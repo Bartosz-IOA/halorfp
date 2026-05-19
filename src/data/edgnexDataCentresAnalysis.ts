@@ -106,14 +106,15 @@ export const EDGNEX_GO_NO_GO: GoNoGoRowData[] = [
     name: 'Client or design partner',
     score: 0,
     max: 30,
-    text: '— No option selected',
-    color: 'bg-slate-400',
+    text: 'No data connected',
+    color: 'bg-slate-300',
+    inputState: 'disconnected',
     details: [
       {
         q: 'How is the client / design partner relationship scored?',
-        a: 'Not scored',
-        notes: 'Mixed / unclear relationship signals; no option locked in matrix.',
-        ref: 'Assessment.xlsx',
+        a: 'Not connected',
+        notes: 'CRM / relationship data stream is not configured for this workspace yet.',
+        ref: '—',
       },
     ],
   },
@@ -172,6 +173,7 @@ export const EDGNEX_GO_NO_GO: GoNoGoRowData[] = [
     max: 30,
     text: '— No option selected',
     color: 'bg-slate-400',
+    inputState: 'unselected',
     details: [
       {
         q: 'Is the programme assessed as realistic?',
@@ -183,17 +185,18 @@ export const EDGNEX_GO_NO_GO: GoNoGoRowData[] = [
   },
   {
     id: '6',
-    name: "DSA's resource capacity",
+    name: 'Resource capacity',
     score: 0,
     max: 30,
-    text: '— No option selected',
-    color: 'bg-slate-400',
+    text: 'No data connected',
+    color: 'bg-slate-300',
+    inputState: 'disconnected',
     details: [
       {
         q: 'Is capacity evidenced?',
-        a: 'Not scored',
-        notes: 'No direct quantitative capacity evidence cited in assessment.',
-        ref: 'Assessment.xlsx',
+        a: 'Not connected',
+        notes: 'Resourcing / capacity API is not connected for this assessment build.',
+        ref: '—',
       },
     ],
   },
@@ -252,7 +255,8 @@ export const EDGNEX_GO_NO_GO: GoNoGoRowData[] = [
     score: 0,
     max: 30,
     text: 'B — Fee proposal due in < two weeks',
-    color: 'bg-slate-400',
+    color: 'bg-red-400',
+    inputState: 'scored',
     details: [
       {
         q: 'Bid period',
@@ -263,6 +267,16 @@ export const EDGNEX_GO_NO_GO: GoNoGoRowData[] = [
     ],
   },
 ];
+
+export const EDGNEX_GO_NO_GO_MAX_POINTS = EDGNEX_GO_NO_GO.reduce((sum, row) => sum + row.max, 0);
+export const EDGNEX_GO_NO_GO_EARNED_POINTS = EDGNEX_GO_NO_GO.reduce((sum, row) => sum + row.score, 0);
+/** Upper bound if neutral / disconnected criteria are resolved favourably (per Assessment.xlsx). */
+export const EDGNEX_GO_NO_GO_MAX_ACHIEVABLE_POINTS = 120;
+
+export function goNoGoScorePercent(earned: number, max: number): number {
+  if (max <= 0) return 0;
+  return Math.round((earned / max) * 1000) / 10;
+}
 
 /** Grouped follow-ups aligned to page sections: sequencing vs checklist. */
 export type EdgnexNextStepsSectionBlock = {

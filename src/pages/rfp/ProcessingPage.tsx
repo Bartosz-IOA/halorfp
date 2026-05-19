@@ -18,13 +18,17 @@ export const ProcessingPage: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const isProcessingFromNewFlow = useEdgnexDemoStore((s) => s.isProcessingFromNewFlow);
+  const isEdgnexVisible = useEdgnexDemoStore((s) => s.isVisible);
   const completeDemoProcessing = useEdgnexDemoStore((s) => s.completeDemoProcessing);
 
   useEffect(() => {
-    if (id === EDGNEX_DEMO_ANALYSIS_ID && !isProcessingFromNewFlow) {
+    if (id !== EDGNEX_DEMO_ANALYSIS_ID || isProcessingFromNewFlow) return;
+    if (isEdgnexVisible) {
+      navigate(`/rfp/${EDGNEX_DEMO_ANALYSIS_ID}`, { replace: true });
+    } else {
       navigate('/rfp', { replace: true });
     }
-  }, [id, isProcessingFromNewFlow, navigate]);
+  }, [id, isProcessingFromNewFlow, isEdgnexVisible, navigate]);
 
   useEffect(() => {
     if (!id) return;
@@ -38,7 +42,7 @@ export const ProcessingPage: React.FC = () => {
       if (id === EDGNEX_DEMO_ANALYSIS_ID) {
         completeDemoProcessing();
       }
-      navigate(`/rfp/${id}`);
+      navigate(`/rfp/${id}`, { replace: true });
     }, 12000);
 
     return () => {

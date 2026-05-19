@@ -9,13 +9,13 @@ import {
   analysisTableShell,
   cn,
 } from '../../components/rfp/ResultPrimitives';
+import { useEdgnexSectionExpandBinding } from '../../contexts/EdgnexReportNavContext';
 import {
   EDGNEX_FEE_ASSET_1_HEADER,
   EDGNEX_FEE_ASSET_2_HEADER,
   EDGNEX_FEE_ASSET_SUMMARY,
   EDGNEX_FEE_DISCIPLINE_PER_ASSET,
   EDGNEX_FEE_INFERRED_CAPTION,
-  EDGNEX_FEE_INTRO,
   EDGNEX_FEE_KEY_ROWS,
   EDGNEX_FEE_SECTION_OVERVIEW,
   EDGNEX_FEE_META,
@@ -149,6 +149,8 @@ function PortfolioDisciplineTable() {
 }
 
 export const FeeEstimationSection: React.FC = () => {
+  const bindFeeExpand = useEdgnexSectionExpandBinding('edgnex-fee');
+
   return (
     <AccordionSection
       sectionId="edgnex-fee"
@@ -161,17 +163,15 @@ export const FeeEstimationSection: React.FC = () => {
         </span>
       }
       defaultExpanded={false}
+      onRegisterExpand={bindFeeExpand}
     >
       <div className="space-y-6 sm:space-y-8">
-        <p className="text-sm leading-relaxed text-navy-primary max-w-[85ch] border-b border-border/60 pb-5">
-          {EDGNEX_FEE_SECTION_OVERVIEW}
-        </p>
         <AnalysisReportHero
           eyebrow="Structured report"
           title={EDGNEX_FEE_META.title}
           subtitle={EDGNEX_FEE_META.projectLine}
           generatedLabel={EDGNEX_FEE_META.generatedLabel}
-          intro={EDGNEX_FEE_INTRO}
+          intro={EDGNEX_FEE_SECTION_OVERVIEW}
           footer={<ReferenceInfoList rows={EDGNEX_FEE_KEY_ROWS} />}
         />
 
